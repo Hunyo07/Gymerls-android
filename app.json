@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "name": "Gymerls",
+    "slug": "gymerls",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "extra": {
+      "eas": {
+        "projectId": "13014b7c-0af4-4eac-b06f-54109bac125e"
+      }
+    },
+    "android": {
+      "package": "com.hunyotv.Gymerls",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    }
+  }
+}
