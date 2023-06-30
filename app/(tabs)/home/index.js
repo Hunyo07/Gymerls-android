@@ -19,7 +19,7 @@ const Tab1Index = () => {
 
   useEffect(() => {
     getData(function (callback) {
-      fetch("https://gymerls.cyclic.app/api/meal-plan", {
+      fetch("https://gymerls-api.vercel.app/api/meal-plan", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -45,7 +45,6 @@ const Tab1Index = () => {
         setUsername(value);
         callback(value);
       } else {
-        console.log("walang makuha boy!");
       }
     } catch (e) {
       // error reading value
@@ -59,7 +58,6 @@ const Tab1Index = () => {
   //     router.replace("/login");
   //     try {
   //         await AsyncStorage.removeItem('username');
-  //         console.log('naka log out kana pre!');
   //         return true;
   //     }
   //     catch(exception) {

@@ -7,65 +7,50 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import MyComponent from "../../(Component)/CustomSearchBar";
-import portein from "../../../assets/images/portien.jpg";
-import { Card, Button } from "react-native-paper";
-import Item from "../../(Component)/ItemInCart";
 import { useState } from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import ItemInCart from "../../(Component)/ItemInCart";
+import { ActivityIndicator, MD2Colors } from "react-native-paper";
 
 const Tab5Index = () => {
-  const router = useRouter();
-
-  const [QuantityValue, setQuantityValue] = useState("");
-  const [Price, setPrice] = useState("");
-  const [TotalPrice, setTotalPrice] = useState("");
+  const [show, setShow] = useState("");
 
   return (
-    <ScrollView style={styles.root}>
-      <View style={{ flex: 1 }}>
-        <View style={styles.mealcontainer}>
-          <Text style={styles.headertext}>CART</Text>
-        </View>
-        <View
-          style={{ width: "90%", alignSelf: "center", marginVertical: "4%" }}
-        >
-          <Item
-            Image={{
-              uri: "https://5.imimg.com/data5/BI/FH/WF/SELLER-9367890/gym-body-protein-powder-nutrition-supplement-500g-500x500.jpg",
+    <View>
+      <View>
+        <ScrollView style={styles.root}>
+          <View style={{ flex: 1 }}>
+            <View style={styles.mealcontainer}>
+              <Text style={styles.headertext}>CART</Text>
+            </View>
+            <ItemInCart />
+          </View>
+
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+              backgroundColor: "#0079FF",
+              width: "95%",
+              alignItems: "center",
+              borderRadius: 5,
+              marginTop: "4%",
             }}
-            Product={"Gym Body Powder"}
-            // setPrice={setPrice}
-            Price={120}
-            setTotalPrice={setTotalPrice}
-            setQuantityValue={setQuantityValue}
-            QuantityValue={" 2"}
-            QuantityValueOnChange={(text) => setQuantityValue(text)}
-            TotalPrice={"240"}
             onPress={() => {}}
-          />
-        </View>
+          >
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 20,
+                marginVertical: "3%",
+                color: "white",
+              }}
+            >
+              PLACE ORDER
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
-      <View style={{ flex: 1 }}>
-        <View
-          style={{ width: "90%", alignSelf: "center", marginVertical: "4%" }}
-        >
-          <Item
-            Image={{
-              uri: "https://cdn.shopify.com/s/files/1/0471/3332/7519/products/JYM5990325-61121_grey_465x.jpg?v=1658437032",
-            }}
-            Product={"Pro Gym"}
-            // setPrice={setPrice}
-            Price={140}
-            setTotalPrice={setTotalPrice}
-            setQuantityValue={setQuantityValue}
-            QuantityValue={" 1"}
-            QuantityValueOnChange={(text) => setQuantityValue(text)}
-            TotalPrice={140}
-            onPress={() => {}}
-          />
-        </View>
-      </View>
-    </ScrollView>
+    </View>
   );
 };
 const styles = StyleSheet.create({

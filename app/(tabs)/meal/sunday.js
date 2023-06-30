@@ -24,7 +24,7 @@ const Tab4Index = () => {
     }, 100);
 
     getData(function (callback) {
-      fetch("https://gymerls.cyclic.app/api/meal-plan", {
+      fetch("https://gymerls-api.vercel.app/api/meal-plan", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -37,7 +37,6 @@ const Tab4Index = () => {
           return response.json();
         })
         .then(function (meals) {
-          // console.log(meals);
           setMealPlanning(meals);
         });
     });
@@ -51,7 +50,6 @@ const Tab4Index = () => {
         setUsername(value);
         callback(value);
       } else {
-        // console.log('walang makuha boy!');
       }
     } catch (e) {
       // error reading value

@@ -71,20 +71,15 @@ const Tab2Index = () => {
   };
 
   useEffect(() => {
-    // console.log("password");
     storeDataPass();
-    // console.log(currentPassword);
-    // console.log(username);
   }, []);
 
   const changePass = () => {
-    // console.log(newPassword);
     if (oldPass === currentPassword) {
       if (currentPassword === newPassword) {
         alert("New password must not be same as your old password");
       } else if (newPassword.length >= 6) {
-        // console.log("same");
-        fetch("https://gymerls.cyclic.app/api/update-password", {
+        fetch("https://gymerls-api.vercel.app/api/update-password", {
           method: "PATCH",
           headers: {
             "Content-type": "application/json",
@@ -327,8 +322,8 @@ const styles = StyleSheet.create({
     elevation: 500,
     alignItems: "center",
     width: "65%",
-    height: "16%",
-    borderRadius: 10,
+    // height: "16%",
+    borderRadius: 5,
     top: "40%",
     zIndex: 1,
     borderWidth: 0.5,
@@ -336,7 +331,7 @@ const styles = StyleSheet.create({
   },
   buttonconfirmcontainer: {
     flexDirection: "row",
-    marginTop: "8%",
+    marginVertical: "8%",
     width: "100%",
     justifyContent: "space-evenly",
   },

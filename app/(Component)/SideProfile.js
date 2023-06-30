@@ -34,7 +34,7 @@ const SideProfile = () => {
       }, 600);
     }
     getData(function (callback) {
-      fetch("https://gymerls.cyclic.app/api/get-user-by-username", {
+      fetch("https://gymerls-api.vercel.app/api/get-user-by-username", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -47,13 +47,10 @@ const SideProfile = () => {
           return response.json();
         })
         .then(function (personinfo) {
-          // console.log(personinfo);
-
           setPersonInfo(personinfo);
         });
     });
   }, []);
-  // console.log(personinfo);
 
   const getData = async (callback) => {
     try {
@@ -63,7 +60,6 @@ const SideProfile = () => {
         setUsername(value);
         callback(value);
       } else {
-        console.log("walang makuha boy!");
       }
     } catch (e) {
       // error reading value
@@ -97,7 +93,6 @@ const SideProfile = () => {
         <View
           style={{
             flex: 1,
-            // alignItems: "flex-end",
             width: "100%",
           }}
         >
@@ -142,7 +137,6 @@ const SideProfile = () => {
                     </View>
                     <View style={styles.age}>
                       <Text style={styles.labelbday}>Age</Text>
-                      {/* <Text>{personinfo.age}</Text> */}
                       <View style={styles.container}>
                         <TextInput editable={false} style={styles.input}>
                           {personinfo.age}
@@ -271,8 +265,6 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     fontSize: 25,
-    // width:"90%",
-    // marginLeft:20,
     backgroundColor: "white",
     padding: "2%",
     borderWidth: 0.5,

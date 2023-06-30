@@ -45,7 +45,7 @@ export default function LogIn() {
 
   const loginUser = () => {
     // GET METHOD
-    // fetch('https://gymerls.cyclic.app/api/users')
+    // fetch('https://gymerls-api.vercel.app/api/users')
     // .then(function(response){
     //     return response.json();
     // })
@@ -54,7 +54,7 @@ export default function LogIn() {
     //   })
 
     // POST METHOD
-    fetch("https://gymerls.cyclic.app/api/get-user", {
+    fetch("https://gymerls-api.vercel.app/api/get-user", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

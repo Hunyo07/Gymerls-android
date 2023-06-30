@@ -18,7 +18,7 @@ const Tab4Index = ({ disabled }) => {
 
   useEffect(() => {
     getData(function (callback) {
-      fetch("https://gymerls.cyclic.app/api/meal-plan", {
+      fetch("https://gymerls-api.vercel.app/api/meal-plan", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -32,7 +32,6 @@ const Tab4Index = ({ disabled }) => {
         })
         .then(function (meals) {
           if (meals.length === 0) {
-            console.log("wala ka pang kaen!");
             setShowError(true);
             setShow(true);
             setTimeout(() => {
@@ -57,20 +56,9 @@ const Tab4Index = ({ disabled }) => {
         setUsername(value);
         callback(value);
       } else {
-        console.log("walang makuha boy!");
       }
     } catch (e) {
       console.log(e);
-    }
-  };
-  const routeToSunday = (count) => {
-    if (count === 2) {
-      // setIsDisabled(true)
-      router.push("dailymeals/sunday");
-      console.log(count);
-    } else {
-      // setIsDisabled(false)
-      console.log(count);
     }
   };
 
@@ -115,9 +103,7 @@ const Tab4Index = ({ disabled }) => {
               disabled={isDisabled}
               style={styles.linkcontainer}
               onPress={() => {
-                var count = 1;
                 router.push("../meal/sunday");
-                // routeToSunday(count);
               }}
             >
               <Text style={styles.text}>Sunday</Text>

@@ -78,6 +78,8 @@ const Item = () => {
             }}
           >
             {product.id % 2 == 0 ? (
+              <></>
+            ) : (
               <>
                 <View
                   style={{
@@ -161,8 +163,6 @@ const Item = () => {
                   </Card>
                 </View>
               </>
-            ) : (
-              <></>
             )}
           </View>
         );
