@@ -1,13 +1,18 @@
 import * as React from "react";
 import { Card, Button, Provider } from "react-native-paper";
 import portein from "../../assets/images/portien.jpg";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import { IconButton, Colors } from "react-native-paper";
+import { Entypo } from "@expo/vector-icons";
+import { clockRunning, sub } from "react-native-reanimated";
 
 const ItemInCart = () => {
   const [product, setProducts] = useState([]);
   const [username, setUsername] = useState("");
+  const [Show, setShow] = useState(false);
 
   const formatDate = (date) => {
     var dateToFormat = new Date(date);
@@ -45,10 +50,21 @@ const ItemInCart = () => {
       })
         .then((res) => res.json())
         .then((result) => {
-          setProducts(result);
+          // setProducts(result);
+          setCart(result);
+          // findSumUsingReduce(result);
         });
+      // let t = 0;
+      // result.map(({ sub_total }) => (t = t + sub_total));
+      // setGrandtotal(t);
     });
-  }, [product]);
+  }, []);
+
+  // function findSumUsingReduce(result) {
+  //   const s = result.reduce((s, { price }) => s + price, 0);
+  //   return s;
+  // }
+
   const getData = async (callback) => {
     try {
       const value = await AsyncStorage.getItem("username");
@@ -63,11 +79,81 @@ const ItemInCart = () => {
       // console.log(e);
     }
   };
-  const addedDate = formatDate(new Date());
+  const [cart, setCart] = useState([]);
+  // const [item, setItem] = useState("");
+  const [grandTotal, setGrandtotal] = useState(0);
+
+  const incrementQuantity = (userId) => {
+    // cart.find((item) => {
+    //   userId === item.id;
+    //   item.quantity++;
+    //   console.log(item);
+    //   // setCart(item);
+    // });
+
+    // setCart((cart) => {
+    //   cart.map((item) => {
+    //     if (userId === item.id) {
+    //       item.quantity++;
+    //       item.sub_total = item.quantity * item.price;
+    //     }
+    //     setCart(item);
+    //     // mappingPrice();
+    //     console.log(item);
+    //     return item;
+    //   });
+    // });
+
+    // setCart.map((item) => {
+    //   if (userId === item.id) {
+    //     item.quantity++;
+    //     // item.sub_total = item.quantity * item.price;
+    //   }
+    //   console.log(item);
+
+    //   return item;
+    //   // setCart(item);
+    //   // // mappingPrice();
+    //   // console.log(item);
+    //   // return item;
+    // });
+    // findSumUsingReduce(cartItem);
+    cart.map((item) => {
+      if (userId === item.id) {
+        item.quantity++;
+        // item.sub_total = item.quantity * item.price;
+      }
+      console.log(item);
+      setCart(item);
+      return item;
+      // setCart(item);
+      // mappingPrice();
+    });
+  };
+
   return (
     <View style={{}}>
-      {product.map((product) => {
+      {Show ? (
+        <>
+          <View style={{ alignItems: "center", marginVertical: "20%" }}>
+            <Text
+              style={{
+                fontFamily: "EncodeSansSemiCondensed_700Bold",
+                color: "grey",
+              }}
+            >
+              MAKE YOUR PURCHASE
+              <Ionicons name="cart-outline" size={24} color="grey" />.
+            </Text>
+          </View>
+        </>
+      ) : (
+        <>{/* <Text>Ate</Text> */}</>
+      )}
+
+      {cart.map((item) => {
         {
+          /* {
         }
         const removeInCart = () => {
           fetch("https://gymerls-api.vercel.app/api/delete-cart", {
@@ -76,125 +162,139 @@ const ItemInCart = () => {
               "Content-type": "application/json",
             },
             body: JSON.stringify({
-              id: product.id,
+              id: item.id,
             }),
           }).then(function (response) {
             return response.json();
           });
-        };
+        }; */
+        }
 
         return (
           <View
-            key={product.id}
+            key={item.id}
             style={{
               width: "90%",
               alignSelf: "center",
             }}
           >
-            {product !== 0 ? (
-              <>
+            <View
+              style={{
+                width: "100%",
+                marginTop: "10%",
+                marginBottom: "5%",
+              }}
+            >
+              <Card>
+                <Card.Cover
+                  source={{ uri: item.image_url }}
+                  resizeMode="contain"
+                  style={{ backgroundColor: "#fff" }}
+                />
                 <View
                   style={{
                     width: "100%",
-                    marginTop: "10%",
-                    marginBottom: "5%",
+                    alignItems: "center",
+                    paddingVertical: "2%",
+                    borderTopWidth: 1,
+                    borderBottomWidth: 1,
+                    borderColor: "black",
+                    marginVertical: 1,
+                    backgroundColor: "#fff",
                   }}
                 >
-                  <Card>
-                    <Card.Cover
-                      source={{ uri: product.image_url }}
-                      resizeMode="contain"
-                      style={{ backgroundColor: "#fff" }}
-                    />
-                    <View
-                      style={{
-                        width: "100%",
-                        alignItems: "center",
-                        paddingVertical: "2%",
-                        borderTopWidth: 1,
-                        borderBottomWidth: 1,
-                        borderColor: "black",
-                        marginVertical: 1,
-                        backgroundColor: "#fff",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontFamily: "EncodeSansSemiCondensed_700Bold",
-                        }}
-                      >
-                        {product.product_name}
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        backgroundColor: "#F9F9F9",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          paddingLeft: "2%",
-                          fontWeight: "bold",
-                          marginVertical: "2%",
-                        }}
-                      >
-                        Quantity: {product.quantity}
-                      </Text>
-                      <Text
-                        style={{
-                          paddingLeft: "2%",
-                          fontWeight: "bold",
-                          marginVertical: "2%",
-                        }}
-                      >
-                        {product.description}
-                      </Text>
-
-                      <Text
-                        style={{
-                          paddingLeft: "2%",
-                          fontWeight: "bold",
-                          marginVertical: "2%",
-                        }}
-                      >
-                        Price: {product.price}
-                      </Text>
-                      <Text
-                        style={{
-                          paddingLeft: "2%",
-                          backgroundColor: "#F9F9F9",
-                          fontWeight: "bold",
-                          marginVertical: "2%",
-                        }}
-                      >
-                        Total: {product.price}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => removeInCart()}
-                        style={{
-                          backgroundColor: "#0079FF",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            marginVertical: "3%",
-                            color: "white",
-                            fontFamily: "EncodeSansSemiCondensed_700Bold",
-                          }}
-                        >
-                          REMOVE
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Card>
+                  <Text
+                    style={{
+                      fontFamily: "EncodeSansSemiCondensed_700Bold",
+                    }}
+                  >
+                    {item.product_name}
+                  </Text>
                 </View>
-              </>
-            ) : (
-              <></>
-            )}
+
+                <View
+                  style={{
+                    backgroundColor: "#F9F9F9",
+                  }}
+                >
+                  <Text
+                    style={{
+                      paddingLeft: "2%",
+                      fontWeight: "bold",
+                      marginVertical: "2%",
+                    }}
+                  >
+                    {item.description}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "2%",
+                      fontWeight: "bold",
+                      marginVertical: "1%",
+                      width: "100%",
+                    }}
+                  >
+                    Quantity{" "}
+                    <TouchableOpacity>
+                      <Entypo
+                        name="minus"
+                        size={20}
+                        color="black"
+                        onPress={() => {}}
+                      />
+                    </TouchableOpacity>
+                    {"   "}
+                    <Text>{item.quantity}</Text>
+                    {"   "}
+                    <TouchableOpacity
+                      onPress={() => {
+                        incrementQuantity(item.id);
+                      }}
+                    >
+                      <Entypo name="plus" size={20} color="black" />
+                    </TouchableOpacity>
+                  </Text>
+
+                  <Text
+                    style={{
+                      paddingLeft: "2%",
+                      fontWeight: "bold",
+                      marginVertical: "2%",
+                    }}
+                  >
+                    Price: {item.price}
+                  </Text>
+                  <Text
+                    style={{
+                      paddingLeft: "2%",
+                      backgroundColor: "#F9F9F9",
+                      fontWeight: "bold",
+                      marginVertical: "2%",
+                    }}
+                  >
+                    Total: {item.price}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => removeInCart()}
+                    style={{
+                      backgroundColor: "#0079FF",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: "3%",
+                        color: "white",
+                        fontFamily: "EncodeSansSemiCondensed_700Bold",
+                      }}
+                    >
+                      REMOVE
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </Card>
+            </View>
           </View>
         );
       })}

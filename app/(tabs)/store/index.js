@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import MyComponent from "../../(Component)/CustomSearchBar";
 import portein from "../../../assets/images/portien.jpg";
@@ -14,14 +15,26 @@ import Item from "../../(Component)/Item";
 import { useState, useEffect } from "react";
 import { Value, clockRunning } from "react-native-reanimated";
 import ItemOdd from "../../(Component)/ItemOdd";
+import React from "react";
 
 const Tab5Index = () => {
   const router = useRouter();
   const [products, setProducts] = useState([]);
-
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <View>
-      <ScrollView style={styles.root}>
+      <ScrollView
+        style={styles.root}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.mealcontainer}>
           <Text style={styles.headertext}>STORE</Text>
         </View>

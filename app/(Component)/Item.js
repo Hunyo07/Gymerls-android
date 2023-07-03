@@ -1,13 +1,26 @@
 import * as React from "react";
-import { Card, Button, Provider } from "react-native-paper";
+import { Card, Provider } from "react-native-paper";
 import portein from "../../assets/images/portien.jpg";
-import { View, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Button,
+  Text,
+  Pressable,
+  RefreshControl,
+} from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clockRunning } from "react-native-reanimated";
+import CustomAddToCart from "./CustomAddToCart";
+import { IconButton, Colors } from "react-native-paper";
 
 const Item = () => {
   const [product, setProducts] = useState([]);
   const [username, setUsername] = useState("");
+  const [cartItem, setCartItem] = useState([]);
+  // const [setShow, setShowAddToCart] = useState(true);
+  const [isDisable, setAddToCartButtonIsDisabled] = useState(false);
 
   const formatDate = (date) => {
     var dateToFormat = new Date(date);
@@ -19,10 +32,11 @@ const Item = () => {
     return formattedDate;
   };
 
-  const storeDataUser = async () => {
+  const storeDataUser = async (callback) => {
     const valueUsername = await AsyncStorage.getItem("username");
     try {
       setUsername(valueUsername);
+      callback(valueUsername);
       return true;
     } catch (exception) {
       return false;
@@ -30,8 +44,8 @@ const Item = () => {
   };
 
   useEffect(() => {
-    storeDataUser();
     // GET METHOD
+    // console.log(product);
     fetch("https://gymerls-api.vercel.app/api/products")
       .then(function (response) {
         return response.json();
@@ -39,7 +53,29 @@ const Item = () => {
       .then(function (product) {
         setProducts(product);
       });
+
+    storeDataUser(function (callback) {
+      fetch("https://gymerls-api.vercel.app/api/get-cart-by-id", {
+        method: "POST",
+        headers: {
+          "Content-type": " application/json",
+        },
+        body: JSON.stringify({
+          username: callback,
+          status: "cart",
+        }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          setCartItem(result);
+        });
+      // console.log(cartItem);
+    });
   }, []);
+
+  const onPressOuts = () => {
+    alert("1 item added in your cart");
+  };
 
   const addToCart = (product_name, image_url, description, price) => {
     const addedDate = formatDate(new Date());
@@ -63,9 +99,12 @@ const Item = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
+        // console.log(result);
       });
   };
+  // const onPressOut = () => {
+  //   setAddToCartButtonIsDisabled(true);
+  // };
   return (
     <View style={{}}>
       {product.map((product) => {
@@ -132,32 +171,17 @@ const Item = () => {
                     >
                       Price: {product.price}
                     </Text>
-                    <TouchableOpacity
-                      onPress={() =>
+
+                    <CustomAddToCart
+                      onPress={() => {
                         addToCart(
                           product.product_name,
                           product.image_url,
                           product.description,
                           product.price
-                        )
-                      }
-                      style={{
-                        backgroundColor: "#0079FF",
-                        alignItems: "center",
-                        // borderRadius: 5,
+                        );
                       }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          marginVertical: "3%",
-                          color: "white",
-                          fontFamily: "EncodeSansSemiCondensed_700Bold",
-                        }}
-                      >
-                        ADD TO CART
-                      </Text>
-                    </TouchableOpacity>
+                    />
                   </Card>
                 </View>
               </>

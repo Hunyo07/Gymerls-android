@@ -6,19 +6,33 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  RefreshControl,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import ItemInCart from "../../(Component)/ItemInCart";
 import { ActivityIndicator, MD2Colors } from "react-native-paper";
+import React from "react";
 
 const Tab5Index = () => {
   const [show, setShow] = useState("");
-
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <View>
       <View>
-        <ScrollView style={styles.root}>
+        <ScrollView
+          style={styles.root}
+          contentContainerStyle={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <View style={{ flex: 1 }}>
             <View style={styles.mealcontainer}>
               <Text style={styles.headertext}>CART</Text>
@@ -45,7 +59,7 @@ const Tab5Index = () => {
                 color: "white",
               }}
             >
-              PLACE ORDER
+              CHECK OUT
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -69,5 +83,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: 700,
   },
+  // scrollView: {
+  //   flex: 1,
+  //   backgroundColor: "pink",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
 });
 export default Tab5Index;

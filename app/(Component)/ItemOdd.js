@@ -4,7 +4,7 @@ import portein from "../../assets/images/portien.jpg";
 import { View, TouchableOpacity, Text } from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import CustomAddToCart from "./CustomAddToCart";
 const Item = () => {
   const [product, setProducts] = useState([]);
   const [username, setUsername] = useState("");
@@ -134,32 +134,18 @@ const Item = () => {
                     >
                       Price: {product.price}
                     </Text>
-                    <TouchableOpacity
-                      onPress={() =>
+
+                    <CustomAddToCart
+                      onPress={() => {
                         addToCart(
                           product.product_name,
                           product.image_url,
                           product.description,
                           product.price
-                        )
-                      }
-                      style={{
-                        backgroundColor: "#0079FF",
-                        alignItems: "center",
-                        // borderRadius: 5,
+                        );
                       }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          marginVertical: "3%",
-                          color: "white",
-                          fontFamily: "EncodeSansSemiCondensed_700Bold",
-                        }}
-                      >
-                        ADD TO CART
-                      </Text>
-                    </TouchableOpacity>
+                    />
+                
                   </Card>
                 </View>
               </>

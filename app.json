@@ -6,7 +6,7 @@
       "bundler": "metro"
     },
     "name": "Gymerls",
-    "slug": "gymerls",
+    "slug": "Gymerls",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
