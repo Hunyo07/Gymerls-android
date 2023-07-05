@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { AuthStore } from "../../store.js";
 import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomButton from "../(Component)/CustomButton.js";
 // import CustomInput from "../(Component)/CustomInput.js";
 import { useHandler } from "react-native-reanimated";
@@ -17,6 +17,7 @@ import { TextInput } from "react-native-paper";
 import { MaterialCommunityIcons } from "react-native-vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Padlock from "../../assets/images/Padlock.png";
+import { NativeViewGestureHandler } from "react-native-gesture-handler";
 
 export default function LogIn() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function LogIn() {
 
   const loginUser = () => {
     // GET METHOD
-    // fetch('https://gymerls-api.vercel.app/api/users')
+    // fetch('https://gymerls-api-xi.vercel.app/api/users')
     // .then(function(response){
     //     return response.json();
     // })
@@ -54,7 +55,7 @@ export default function LogIn() {
     //   })
 
     // POST METHOD
-    fetch("https://gymerls-api.vercel.app/api/get-user", {
+    fetch("https://gymerls-api-xi.vercel.app/api/get-user", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -83,6 +84,25 @@ export default function LogIn() {
         }
       });
   };
+
+  useEffect(() => {
+    fetch("https://gymerls-api-xi.vercel.app/api/get-user", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (userData) {
+        console.log(userData);
+      });
+  }, []);
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

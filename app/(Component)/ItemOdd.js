@@ -32,7 +32,7 @@ const Item = () => {
   useEffect(() => {
     storeDataUser();
     // GET METHOD
-    fetch("https://gymerls-api.vercel.app/api/products")
+    fetch("https://gymerls-api-xi.vercel.app/api/products")
       .then(function (response) {
         return response.json();
       })
@@ -44,7 +44,7 @@ const Item = () => {
   const addToCart = (product_name, image_url, description, price) => {
     const addedDate = formatDate(new Date());
 
-    fetch("https://gymerls-api.vercel.app/api/add-to-cart", {
+    fetch("https://gymerls-api-xi.vercel.app/api/add-to-cart", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -145,7 +145,6 @@ const Item = () => {
                         );
                       }}
                     />
-                
                   </Card>
                 </View>
               </>

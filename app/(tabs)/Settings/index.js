@@ -79,7 +79,7 @@ const Tab2Index = () => {
       if (currentPassword === newPassword) {
         alert("New password must not be same as your old password");
       } else if (newPassword.length >= 6) {
-        fetch("https://gymerls-api.vercel.app/api/update-password", {
+        fetch("https://gymerls-api-xi.vercel.app/api/update-password", {
           method: "PATCH",
           headers: {
             "Content-type": "application/json",

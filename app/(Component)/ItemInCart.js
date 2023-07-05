@@ -38,7 +38,7 @@ const ItemInCart = () => {
     storeDataUser();
     // GET METHOD
     getData(function (callback) {
-      fetch("https://gymerls-api.vercel.app/api/get-cart-by-id", {
+      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
         method: "POST",
         headers: {
           "Content-type": " application/json",
@@ -79,6 +79,7 @@ const ItemInCart = () => {
       // console.log(e);
     }
   };
+
   const [cart, setCart] = useState([]);
   // const [item, setItem] = useState("");
   const [grandTotal, setGrandtotal] = useState(0);
@@ -90,7 +91,6 @@ const ItemInCart = () => {
     //   console.log(item);
     //   // setCart(item);
     // });
-
     // setCart((cart) => {
     //   cart.map((item) => {
     //     if (userId === item.id) {
@@ -103,21 +103,19 @@ const ItemInCart = () => {
     //     return item;
     //   });
     // });
-
     // setCart.map((item) => {
     //   if (userId === item.id) {
     //     item.quantity++;
     //     // item.sub_total = item.quantity * item.price;
     //   }
     //   console.log(item);
-
     //   return item;
     //   // setCart(item);
     //   // // mappingPrice();
     //   // console.log(item);
     //   // return item;
     // });
-    // findSumUsingReduce(cartItem);
+    // // findSumUsingReduce(cartItem);
     cart.map((item) => {
       if (userId === item.id) {
         item.quantity++;
@@ -156,7 +154,7 @@ const ItemInCart = () => {
           /* {
         }
         const removeInCart = () => {
-          fetch("https://gymerls-api.vercel.app/api/delete-cart", {
+          fetch("https://gymerls-api-xi.vercel.app/api/delete-cart", {
             method: "PATCH",
             headers: {
               "Content-type": "application/json",

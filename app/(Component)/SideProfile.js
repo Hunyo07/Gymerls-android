@@ -34,7 +34,7 @@ const SideProfile = () => {
       }, 600);
     }
     getData(function (callback) {
-      fetch("https://gymerls-api.vercel.app/api/get-user-by-username", {
+      fetch("https://gymerls-api-xi.vercel.app/api/get-user-by-username", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

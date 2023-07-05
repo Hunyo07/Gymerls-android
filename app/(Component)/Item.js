@@ -13,13 +13,11 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { clockRunning } from "react-native-reanimated";
 import CustomAddToCart from "./CustomAddToCart";
-import { IconButton, Colors } from "react-native-paper";
 
 const Item = () => {
   const [product, setProducts] = useState([]);
   const [username, setUsername] = useState("");
   const [cartItem, setCartItem] = useState([]);
-  // const [setShow, setShowAddToCart] = useState(true);
   const [isDisable, setAddToCartButtonIsDisabled] = useState(false);
 
   const formatDate = (date) => {
@@ -46,7 +44,7 @@ const Item = () => {
   useEffect(() => {
     // GET METHOD
     // console.log(product);
-    fetch("https://gymerls-api.vercel.app/api/products")
+    fetch("https://gymerls-api-xi.vercel.app/api/products")
       .then(function (response) {
         return response.json();
       })
@@ -55,7 +53,7 @@ const Item = () => {
       });
 
     storeDataUser(function (callback) {
-      fetch("https://gymerls-api.vercel.app/api/get-cart-by-id", {
+      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
         method: "POST",
         headers: {
           "Content-type": " application/json",
@@ -77,10 +75,17 @@ const Item = () => {
     alert("1 item added in your cart");
   };
 
+  var number = 4;
+
+  const button = () => {
+    4 + number;
+    return number;
+  };
+
   const addToCart = (product_name, image_url, description, price) => {
     const addedDate = formatDate(new Date());
 
-    fetch("https://gymerls-api.vercel.app/api/add-to-cart", {
+    fetch("https://gymerls-api-xi.vercel.app/api/add-to-cart", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -99,15 +104,20 @@ const Item = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        // console.log(result);
+        console.log(result);
       });
   };
+
   // const onPressOut = () => {
   //   setAddToCartButtonIsDisabled(true);
   // };
   return (
     <View style={{}}>
       {product.map((product) => {
+        {
+          /* console.log(product.price); */
+        }
+
         return (
           <View
             key={product.id}
