@@ -3,6 +3,7 @@ import { Text } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 // 🏠
 // ⚙️
 
@@ -56,6 +57,17 @@ const TabsLayout = () => {
           tabBarIcon: () => (
             <Text>
               <Entypo name="shopping-cart" size={30} color="black" />
+            </Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Schedule"
+        options={{
+          title: "Schedule",
+          tabBarIcon: () => (
+            <Text>
+              <FontAwesome name="calendar" size={24} color="black" />
             </Text>
           ),
         }}

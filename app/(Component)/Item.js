@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { clockRunning } from "react-native-reanimated";
 import CustomAddToCart from "./CustomAddToCart";
 
 const Item = () => {
@@ -69,53 +68,55 @@ const Item = () => {
         });
       // console.log(cartItem);
     });
-  }, []);
+  }, [cartItem]);
 
   const onPressOuts = () => {
     alert("1 item added in your cart");
   };
 
-  var number = 4;
-
-  const button = () => {
-    4 + number;
-    return number;
-  };
-
-  const addToCart = (product_name, image_url, description, price) => {
+  const addToCart = (product_name, image_url, description, price, id) => {
     const addedDate = formatDate(new Date());
-
-    fetch("https://gymerls-api-xi.vercel.app/api/add-to-cart", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        product_name: product_name,
-        image_url: image_url,
-        description: description,
-        price: price,
-        quantity: 1,
-        sub_total: price,
-        status: "cart",
-        added_date: addedDate,
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log(result);
-      });
+    if (id === id) {
+      fetch("https://gymerls-api-xi.vercel.app/api/add-to-cart", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          product_name: product_name,
+          image_url: image_url,
+          description: description,
+          price: price,
+          quantity: 1,
+          sub_total: price,
+          status: "cart",
+          added_date: addedDate,
+        }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result);
+        });
+    } else {
+      console.log(error);
+    }
   };
 
   // const onPressOut = () => {
   //   setAddToCartButtonIsDisabled(true);
   // };
+
+  // var idNum = 1;
+
   return (
     <View style={{}}>
       {product.map((product) => {
         {
-          /* console.log(product.price); */
+          /* if (idNum === product.id) {
+          console.log(product.product_name);
+        } else {
+        } */
         }
 
         return (
@@ -188,7 +189,8 @@ const Item = () => {
                           product.product_name,
                           product.image_url,
                           product.description,
-                          product.price
+                          product.price,
+                          product.id
                         );
                       }}
                     />

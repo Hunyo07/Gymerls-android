@@ -18,7 +18,6 @@ import { TextInput } from "react-native-paper";
 
 const Tab2Index = () => {
   const router = useRouter();
-  const routerAgain = useRouter();
 
   const [showSignout, setShowSignout] = useState(false);
   const [showChangePass, setShowChangePass] = useState(false);

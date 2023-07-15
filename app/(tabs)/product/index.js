@@ -8,21 +8,175 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import { useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { useContext, useEffect, useState } from "react";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import ItemInCart from "../../(Component)/ItemInCart";
-import { ActivityIndicator, MD2Colors } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  MD2Colors,
+  TextInput,
+  RadioButton,
+} from "react-native-paper";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Entypo } from "@expo/vector-icons";
 
 const Tab5Index = () => {
+  const router = useRouter();
+
+  const [showCheckOut, setShowCheckOut] = useState(false);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [subTotals, setSubTotals] = useState(0);
+  const [showNo, setShowNo] = useState(false);
+  const [showGtotalCheckOut, setShowGtotalCheckOut] = useState(false);
+  const [deliverPickup, setDeliverPickup] = useState(false);
+  const [checked, setChecked] = React.useState("first");
+  const [decrementDisable, setDisableDecrement] = useState(false);
+  const [cart, setCart] = useState([]);
+  const [username, setUsername] = useState("");
   const [show, setShow] = useState("");
   const [refreshing, setRefreshing] = React.useState(false);
+  const [address, setAddress] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [contact, setContactNo] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
   }, []);
+  useEffect(() => {
+    if (cart.length == []) {
+      setShowNo(true);
+      setShowGtotalCheckOut(true);
+    } else {
+      setShowGtotalCheckOut(false);
+      setShowNo(false);
+    }
+
+    getData(function (callback) {
+      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
+        method: "POST",
+        headers: {
+          "Content-type": " application/json",
+        },
+        body: JSON.stringify({
+          username: callback,
+          status: "cart",
+        }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          mappingPrice();
+          setCart(result);
+        });
+    });
+  }, [refreshing]);
+  const getData = async (callback) => {
+    try {
+      const value = await AsyncStorage.getItem("username");
+      if (value !== null) {
+        setUsername(value);
+        callback(value);
+      } else {
+      }
+    } catch (e) {}
+  };
+
+  const [newCart, setNewCart] = useState([]);
+  const [item, setItem] = useState("");
+
+  const mappingPrice = () => {
+    let t = 0;
+    cart.map(({ sub_total }) => (t = t + sub_total));
+    setGrandTotal(t);
+    return t;
+  };
+
+  const deleteCartItemAfterCheckout = (id) => {
+    fetch("https://gymerls-api-xi.vercel.app/api/delete-cart", {
+      method: "PATCH",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        // alert("Cart item deleted");
+      });
+  };
+  const formatDate = (date) => {
+    var dateToFormat = new Date(date);
+    var year = dateToFormat.toLocaleString("default", { year: "numeric" });
+    var month = dateToFormat.toLocaleString("default", { month: "2-digit" });
+    var day = dateToFormat.toLocaleString("default", { day: "2-digit" });
+
+    var formattedDate = year + "-" + month + "-" + day;
+    return formattedDate;
+  };
+
+  const placeOder = () => {
+    if (fullname == "" && contact == "") {
+      console.log("wala");
+      alert("Please type your fullname or contact.no ");
+    } else if (address == "") {
+      alert("Please type your address ");
+    } else {
+      for (let post of cart) {
+        deleteCartItemAfterCheckout(post.id);
+      }
+      for (let item of cart) {
+        // console.log(item.product_name);
+        newCart.push(item.product_name);
+      }
+
+      var newItem = JSON.stringify(newCart).replace(/\[|\]/g, "");
+      var replaceItem = newItem.replace(/"/g, "");
+      const transactionDate = formatDate(new Date());
+
+      fetch("https://gymerls-api-xi.vercel.app/api/transaction", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          fullname: fullname,
+          contact: contact,
+          method: paymentMethod,
+          address: address,
+          items: replaceItem,
+          total: grandTotal,
+          status: "Pending",
+          receipt_url: "image.jpg",
+          transaction_date: transactionDate,
+        }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          setShowCheckOut(false);
+          onRefresh();
+          alert("Transaction success");
+          console.log(result);
+        });
+    }
+
+    // console.log(replaceItem);
+    // console.log(fullname);
+    // console.log(contact);
+    // console.log(paymentMethod);
+    // console.log(address);
+    // console.log(grandTotal);
+  };
+
   return (
     <View>
       <View>
@@ -33,36 +187,432 @@ const Tab5Index = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View style={{ flex: 1 }}>
+          <View>
             <View style={styles.mealcontainer}>
               <Text style={styles.headertext}>CART</Text>
             </View>
-            <ItemInCart />
-          </View>
 
-          <TouchableOpacity
-            style={{
-              alignSelf: "center",
-              backgroundColor: "#0079FF",
-              width: "95%",
-              alignItems: "center",
-              borderRadius: 5,
-              marginTop: "4%",
-            }}
-            onPress={() => {}}
-          >
-            <Text
+            {showNo ? (
+              <>
+                <View style={{ alignItems: "center", marginVertical: "20%" }}>
+                  <Text
+                    style={{
+                      fontFamily: "EncodeSansSemiCondensed_700Bold",
+                      color: "grey",
+                    }}
+                  >
+                    MAKE YOUR PURCHASE
+                    <Ionicons name="cart-outline" size={24} color="grey" />.
+                  </Text>
+                  <Button
+                    onPress={() => {
+                      router.replace("../store");
+                    }}
+                    style={{ marginTop: "2%" }}
+                    mode="contained"
+                  >
+                    Shop Now
+                  </Button>
+                </View>
+              </>
+            ) : (
+              <>
+                {cart.map((item) => {
+                  const removeInCart = () => {
+                    fetch("https://gymerls-api-xi.vercel.app/api/delete-cart", {
+                      method: "PATCH",
+                      headers: {
+                        "Content-type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        id: item.id,
+                      }),
+                    }).then(function (response) {
+                      return response.json();
+                    });
+                  };
+
+                  const incrementQuantity = (id) => {
+                    cart.map((item) => {
+                      if (id === item.id) {
+                        setQuantity(item.quantity++);
+                        setSubTotals(
+                          (item.sub_total = item.quantity * item.price)
+                        );
+                        if (item.quantity >= 1) {
+                          setDisableDecrement(false);
+                        }
+                        mappingPrice();
+                      }
+                    });
+                  };
+
+                  const decrementQuantity = (id) => {
+                    cart.map((item) => {
+                      if (id === item.id) {
+                        setQuantity(item.quantity--);
+                        setSubTotals(
+                          (item.sub_total = item.quantity * item.price)
+                        );
+                        if (item.quantity <= 1) {
+                          setDisableDecrement(true);
+                        }
+                        mappingPrice();
+                      }
+                    });
+                  };
+
+                  return (
+                    <View key={item.id}>
+                      <ItemInCart
+                        Product_name={item.product_name}
+                        Description={item.description}
+                        Price={item.price}
+                        source={{ uri: item.image_url }}
+                        Quantity={item.quantity}
+                        Sub_total={item.sub_total}
+                        setValueQuantity={setQuantity}
+                        disableDecrement={decrementDisable}
+                        onChangeTextQuantity={(text) => setQuantity(text)}
+                        onPressIncrement={() => incrementQuantity(item.id)}
+                        onPressDecrement={() => decrementQuantity(item.id)}
+                        onPressremoveCart={() => removeInCart()}
+                      />
+                    </View>
+                  );
+                })}
+              </>
+            )}
+
+            {showGtotalCheckOut ? (
+              <></>
+            ) : (
+              <>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    marginTop: "2%",
+                    marginHorizontal: "2%",
+                    borderBottomWidth: 1,
+                  }}
+                  setValue={setGrandTotal}
+                  onChangeText={(text) => setGrandTotal(text)}
+                >
+                  Grand Total: {grandTotal}
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    alignSelf: "center",
+                    backgroundColor: "#0079FF",
+                    width: "95%",
+                    alignItems: "center",
+                    borderRadius: 5,
+                    marginTop: "4%",
+                  }}
+                  onPress={() => {
+                    setShowCheckOut(true);
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 20,
+                      marginVertical: "3%",
+                      color: "white",
+                      marginBottom: "2%",
+                    }}
+                  >
+                    CHECK OUT
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </ScrollView>
+        {showCheckOut ? (
+          <>
+            <View
               style={{
-                fontWeight: "bold",
-                fontSize: 20,
-                marginVertical: "3%",
-                color: "white",
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                zIndex: 2,
+                backgroundColor: "white",
+                paddingTop: "8%",
               }}
             >
-              CHECK OUT
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
+              <ScrollView>
+                <View style={{ flexDirection: "row" }}>
+                  <View style={{ flex: 1 }}>
+                    <TouchableOpacity
+                      style={{
+                        width: "10%",
+                        alignItems: "center",
+                        marginHorizontal: "1%",
+                        justifyContent: "center",
+                      }}
+                      onPress={() => {
+                        setShowCheckOut(false);
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                          fontSize: 14,
+                        }}
+                      >
+                        <Entypo name="chevron-small-left" size={45} />
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={{ width: "100%", marginVertical: "1%" }}>
+                  <View>
+                    <Text
+                      style={{
+                        marginVertical: "2%",
+                        marginLeft: "3%",
+                        fontSize: 20,
+                        fontWeight: "600",
+                      }}
+                    >
+                      Billing Details
+                    </Text>
+                  </View>
+                  <TextInput
+                    onChangeText={(text) => setFullname(text)}
+                    setValue={setFullname}
+                    value={fullname}
+                    placeholder="Fullname"
+                    style={{
+                      marginHorizontal: "3%",
+                      marginBottom: "2%",
+                      backgroundColor: "white",
+                    }}
+                    mode="outlined"
+                    theme={{ colors: { text: "white", primary: "black" } }}
+                  />
+                  <TextInput
+                    onChangeText={(text) => setContactNo(text)}
+                    value={contact}
+                    setValue={setContactNo}
+                    placeholder="Contact no."
+                    style={{
+                      marginHorizontal: "3%",
+                      marginBottom: "2%",
+                      backgroundColor: "white",
+                    }}
+                    mode="outlined"
+                    theme={{ colors: { text: "white", primary: "black" } }}
+                    inputMode="numeric"
+                    maxLength={11}
+                  />
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginLeft: "2%",
+                  }}
+                >
+                  <View>
+                    <RadioButton
+                      theme={{ colors: { text: "white", primary: "#0A6EBD" } }}
+                      value="first"
+                      status={checked === "first" ? "checked" : "unchecked"}
+                      onPress={() => {
+                        setChecked("first");
+                        setDeliverPickup(false);
+
+                        if (deliverPickup == true) {
+                          setAddress("");
+                          setPaymentMethod("Deliver");
+                        }
+                      }}
+                    />
+                  </View>
+                  <View style={{ justifyContent: "center" }}>
+                    <Text>Deliver</Text>
+                  </View>
+                  <View>
+                    <RadioButton
+                      theme={{ colors: { text: "white", primary: "#0A6EBD" } }}
+                      value="second"
+                      status={checked === "second" ? "checked" : "unchecked"}
+                      onPress={() => {
+                        setChecked("second");
+                        setDeliverPickup(true);
+                        if (deliverPickup == false) {
+                          setAddress("kanto school");
+                          setPaymentMethod("Pickup");
+                        }
+                      }}
+                    />
+                  </View>
+                  <View style={{ justifyContent: "center" }}>
+                    <Text>Pickup</Text>
+                  </View>
+                </View>
+                <View>
+                  {deliverPickup ? (
+                    <>
+                      <TextInput
+                        style={{
+                          marginHorizontal: "2%",
+                          height: 70,
+                          marginVertical: "3%",
+                          color: "black",
+                          backgroundColor: "white",
+                        }}
+                        mode="outlined"
+                        editable={false}
+                        label="Address"
+                        value={address}
+                        setValue={setAddress}
+                        onChangeText={(text) => setAddress(text)}
+                        theme={{ colors: { text: "white", primary: "black" } }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <TextInput
+                        style={{
+                          marginHorizontal: "2%",
+                          height: 70,
+                          marginVertical: "3%",
+                          backgroundColor: "white",
+                        }}
+                        mode="outlined"
+                        // setValue={setUsername}
+                        label="Address"
+                        value={address}
+                        setValue={setAddress}
+                        onChangeText={(text) => setAddress(text)}
+                        // onChangeText={(text) => setUsername(text)}
+                        theme={{ colors: { text: "white", primary: "black" } }}
+                      />
+                    </>
+                  )}
+                </View>
+                <View>
+                  {cart.map((item) => {
+                    return (
+                      <View key={item.id} style={{ borderBottomWidth: 0.5 }}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            width: "100%",
+                            // borderBottomWidth: 2,
+                            paddingVertical: "2%",
+                            marginTop: "2%",
+                          }}
+                        >
+                          <View style={{ flex: 1, marginLeft: "2%" }}>
+                            <Image
+                              source={{ uri: item.image_url }}
+                              style={{ height: 50 }}
+                            />
+                          </View>
+                          <View
+                            style={{
+                              flex: 3,
+                              marginHorizontal: "5%",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Text style={{ fontWeight: "bold" }}>
+                              {item.product_name}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 3,
+                              marginLeft: "2%",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Text style={{ fontWeight: "bold" }}>
+                              {item.quantity} x
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Text style={{ fontWeight: "bold" }}>
+                              {item.sub_total}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  })}
+
+                  <View>
+                    <View
+                      style={{
+                        marginHorizontal: "2%",
+                        flexDirection: "row",
+                        marginVertical: "2%",
+                        borderBottomWidth: 1,
+                        paddingVertical: "2%",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: 18,
+                          flex: 1,
+                        }}
+                      >
+                        Total:
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                          fontSize: 18,
+                          marginHorizontal: "2%",
+                        }}
+                      >
+                        {grandTotal}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={{
+                        alignSelf: "center",
+                        backgroundColor: "#0079FF",
+                        width: "95%",
+                        alignItems: "center",
+                        borderRadius: 5,
+                        marginTop: "4%",
+                        marginBottom: "2%",
+                      }}
+                      onPress={() => {
+                        placeOder();
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "bold",
+                          fontSize: 20,
+                          marginVertical: "3%",
+                          color: "white",
+                        }}
+                      >
+                        PLACE ORDER
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ScrollView>
+            </View>
+          </>
+        ) : (
+          <></>
+        )}
       </View>
     </View>
   );
@@ -83,11 +633,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: 700,
   },
-  // scrollView: {
-  //   flex: 1,
-  //   backgroundColor: "pink",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  // },
 });
 export default Tab5Index;
