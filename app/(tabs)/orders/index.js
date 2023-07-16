@@ -65,7 +65,14 @@ const orders = () => {
       <View style={styles.mealcontainer}>
         <Text style={styles.headertext}>ORDERS</Text>
       </View>
-      <ScrollView>
+      <ScrollView
+        style={{
+          backgroundColor: "#1D5D9B",
+          borderRadius: 5,
+          width: "98%",
+          alignSelf: "center",
+        }}
+      >
         <View style={{ marginVertical: "4%" }}>
           {transactShow ? (
             <>
@@ -80,7 +87,7 @@ const orders = () => {
               {transaction.map((trans) => {
                 return (
                   <View key={trans.id} style={{}}>
-                    <View>
+                    <View style={{ elevation: 20 }}>
                       <View
                         style={{
                           width: "90%",
@@ -89,7 +96,6 @@ const orders = () => {
                           marginTop: "2%",
                           borderRadius: 10,
                           padding: "2%",
-                          elevation: 10,
                           backgroundColor: "#fff",
                         }}
                       >
@@ -195,6 +201,7 @@ const styles = StyleSheet.create({
     width: "98%",
     backgroundColor: "#023047",
     marginTop: "10%",
+    marginBottom: "2%",
     padding: 10,
     borderRadius: 10,
   },

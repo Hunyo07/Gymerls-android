@@ -42,6 +42,11 @@ const Tab5Index = () => {
           style={{
             flexDirection: "row",
             justifyContent: "space-evenly",
+            backgroundColor: "#1D5D9B",
+            borderRadius: 5,
+            width: "98%",
+            alignSelf: "center",
+            marginTop: "2%",
           }}
         >
           <View style={{ width: "48%" }}>

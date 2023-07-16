@@ -194,460 +194,475 @@ const Tab5Index = () => {
 
   return (
     <View>
-      <View>
-        <ScrollView
-          style={styles.root}
-          contentContainerStyle={styles.scrollView}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          <View>
-            <View style={styles.mealcontainer}>
-              <Text style={styles.headertext}>CART</Text>
-            </View>
+      <ScrollView
+        style={styles.root}
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.mealcontainer}>
+          <Text style={styles.headertext}>CART</Text>
+        </View>
 
-            {showNo ? (
-              <>
-                <View style={{ alignItems: "center", marginVertical: "20%" }}>
+        <View
+          style={{
+            backgroundColor: "#1D5D9B",
+            borderRadius: 5,
+            width: "98%",
+            alignSelf: "center",
+            marginTop: "2%",
+          }}
+        >
+          {showNo ? (
+            <>
+              <View style={{ alignItems: "center", marginVertical: "20%" }}>
+                <Text
+                  style={{
+                    fontFamily: "EncodeSansSemiCondensed_700Bold",
+                    color: "grey",
+                  }}
+                >
+                  MAKE YOUR PURCHASE
+                  <Ionicons name="cart-outline" size={24} color="grey" />.
+                </Text>
+                <Button
+                  onPress={() => {
+                    router.replace("../store");
+                  }}
+                  style={{ marginTop: "2%", backgroundColor: "#0A6EBD" }}
+                  mode="contained"
+                >
+                  Shop Now
+                </Button>
+              </View>
+            </>
+          ) : (
+            <>
+              {cart.map((item) => {
+                const removeInCart = () => {
+                  fetch(
+                    "https://gymerls-api-staging.vercel.app/api/delete-cart",
+                    {
+                      method: "PATCH",
+                      headers: {
+                        "Content-type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        id: item.id,
+                      }),
+                    }
+                  ).then(function (response) {
+                    return response.json();
+                  });
+                };
+
+                const incrementQuantity = (id) => {
+                  cart.map((item) => {
+                    if (id === item.id) {
+                      setQuantity(item.quantity++);
+                      setSubTotals(
+                        (item.sub_total = item.quantity * item.price)
+                      );
+                      if (item.quantity >= 1) {
+                        setDisableDecrement(false);
+                      }
+                      mappingPrice();
+                    }
+                  });
+                };
+
+                const decrementQuantity = (id) => {
+                  cart.map((item) => {
+                    if (id === item.id) {
+                      setQuantity(item.quantity--);
+                      setSubTotals(
+                        (item.sub_total = item.quantity * item.price)
+                      );
+                      if (item.quantity <= 1) {
+                        setDisableDecrement(true);
+                      }
+                      mappingPrice();
+                    }
+                  });
+                };
+
+                return (
+                  <View key={item.id}>
+                    <ItemInCart
+                      Product_name={item.product_name}
+                      Description={item.description}
+                      Price={item.price}
+                      source={{ uri: item.image_url }}
+                      Quantity={item.quantity}
+                      Sub_total={item.sub_total}
+                      setValueQuantity={setQuantity}
+                      disableDecrement={decrementDisable}
+                      onChangeTextQuantity={(text) => setQuantity(text)}
+                      onPressIncrement={() => incrementQuantity(item.id)}
+                      onPressDecrement={() => decrementQuantity(item.id)}
+                      onPressremoveCart={() => {
+                        removeInCart();
+                        onRefresh();
+                      }}
+                    />
+                  </View>
+                );
+              })}
+            </>
+          )}
+
+          {showGtotalCheckOut ? (
+            <></>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginHorizontal: "2%",
+                  marginTop: "2%",
+                  backgroundColor: "#F9F9F9",
+                  borderRadius: 5,
+                  padding: "2%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    marginHorizontal: "2%",
+                    flex: 3,
+                    fontSize: 19,
+                  }}
+                  setValue={setGrandTotal}
+                  onChangeText={(text) => setGrandTotal(text)}
+                >
+                  TOTAL:
+                </Text>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: 19,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {grandTotal}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  alignSelf: "center",
+                  backgroundColor: "#0079FF",
+                  width: "95%",
+                  alignItems: "center",
+                  borderRadius: 5,
+                  marginVertical: "3%",
+                }}
+                onPress={() => {
+                  setShowCheckOut(true);
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: 20,
+                    marginVertical: "3%",
+                    color: "white",
+                  }}
+                >
+                  CHECK OUT
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </ScrollView>
+
+      {showCheckOut ? (
+        <>
+          <View
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              zIndex: 2,
+              backgroundColor: "white",
+              paddingTop: "8%",
+            }}
+          >
+            <ScrollView>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1 }}>
+                  <TouchableOpacity
+                    style={{
+                      width: "10%",
+                      alignItems: "center",
+                      marginHorizontal: "1%",
+                      justifyContent: "center",
+                    }}
+                    onPress={() => {
+                      setShowCheckOut(false);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "600",
+                        fontSize: 14,
+                      }}
+                    >
+                      <Entypo name="chevron-small-left" size={45} />
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ width: "100%", marginVertical: "1%" }}>
+                <View>
                   <Text
                     style={{
-                      fontFamily: "EncodeSansSemiCondensed_700Bold",
-                      color: "grey",
+                      marginVertical: "2%",
+                      marginLeft: "3%",
+                      fontSize: 20,
+                      fontWeight: "600",
                     }}
                   >
-                    MAKE YOUR PURCHASE
-                    <Ionicons name="cart-outline" size={24} color="grey" />.
+                    Billing Details
                   </Text>
-                  <Button
-                    onPress={() => {
-                      router.replace("../store");
-                    }}
-                    style={{ marginTop: "2%", backgroundColor: "#0A6EBD" }}
-                    mode="contained"
-                  >
-                    Shop Now
-                  </Button>
                 </View>
-              </>
-            ) : (
-              <>
+                <TextInput
+                  onChangeText={(text) => setFullname(text)}
+                  setValue={setFullname}
+                  value={fullname}
+                  placeholder="Fullname"
+                  style={{
+                    marginHorizontal: "3%",
+                    marginBottom: "2%",
+                    backgroundColor: "white",
+                  }}
+                  mode="outlined"
+                  theme={{ colors: { text: "white", primary: "black" } }}
+                />
+                <TextInput
+                  onChangeText={(text) => setContactNo(text)}
+                  value={contact}
+                  setValue={setContactNo}
+                  placeholder="Contact no."
+                  style={{
+                    marginHorizontal: "3%",
+                    marginBottom: "2%",
+                    backgroundColor: "white",
+                  }}
+                  mode="outlined"
+                  theme={{ colors: { text: "white", primary: "black" } }}
+                  inputMode="numeric"
+                  maxLength={11}
+                />
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginLeft: "2%",
+                }}
+              >
+                <View>
+                  <RadioButton
+                    theme={{ colors: { text: "white", primary: "#0A6EBD" } }}
+                    value="first"
+                    status={checked === "first" ? "checked" : "unchecked"}
+                    onPress={() => {
+                      setChecked("first");
+                      setDeliverPickup(false);
+
+                      if (deliverPickup == true) {
+                        setAddress("");
+                        setPaymentMethod("Deliver");
+                      }
+                    }}
+                  />
+                </View>
+                <View style={{ justifyContent: "center" }}>
+                  <Text>Deliver</Text>
+                </View>
+                <View>
+                  <RadioButton
+                    theme={{ colors: { text: "white", primary: "#0A6EBD" } }}
+                    value="second"
+                    status={checked === "second" ? "checked" : "unchecked"}
+                    onPress={() => {
+                      setChecked("second");
+                      setDeliverPickup(true);
+                      if (deliverPickup == false) {
+                        setAddress(
+                          "3rd Floor , Dona Pacita Building beside PureGold Paniqui, Tarlac, Philippines"
+                        );
+                        setPaymentMethod("Pickup");
+                      }
+                    }}
+                  />
+                </View>
+                <View style={{ justifyContent: "center" }}>
+                  <Text>Pickup</Text>
+                </View>
+              </View>
+              <View>
+                {deliverPickup ? (
+                  <>
+                    <Text
+                      style={{
+                        color: "grey",
+                        alignSelf: "center",
+                        borderWidth: 0.5,
+                        padding: "3%",
+                        borderRadius: 5,
+                        backgroundColor: "#ebebeb",
+                        fontWeight: "600",
+                      }}
+                      mode="outlined"
+                      editable={false}
+                      label="Address"
+                      setValue={setAddress}
+                      onChangeText={(text) => setAddress(text)}
+                    >
+                      {address}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <TextInput
+                      style={{
+                        marginHorizontal: "2%",
+                        height: 70,
+                        marginVertical: "3%",
+                        backgroundColor: "white",
+                      }}
+                      mode="outlined"
+                      label="Address"
+                      value={address}
+                      setValue={setAddress}
+                      onChangeText={(text) => setAddress(text)}
+                      theme={{ colors: { text: "white", primary: "black" } }}
+                    />
+                  </>
+                )}
+              </View>
+              <View>
                 {cart.map((item) => {
-                  const removeInCart = () => {
-                    fetch(
-                      "https://gymerls-api-staging.vercel.app/api/delete-cart",
-                      {
-                        method: "PATCH",
-                        headers: {
-                          "Content-type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          id: item.id,
-                        }),
-                      }
-                    ).then(function (response) {
-                      return response.json();
-                    });
-                  };
-
-                  const incrementQuantity = (id) => {
-                    cart.map((item) => {
-                      if (id === item.id) {
-                        setQuantity(item.quantity++);
-                        setSubTotals(
-                          (item.sub_total = item.quantity * item.price)
-                        );
-                        if (item.quantity >= 1) {
-                          setDisableDecrement(false);
-                        }
-                        mappingPrice();
-                      }
-                    });
-                  };
-
-                  const decrementQuantity = (id) => {
-                    cart.map((item) => {
-                      if (id === item.id) {
-                        setQuantity(item.quantity--);
-                        setSubTotals(
-                          (item.sub_total = item.quantity * item.price)
-                        );
-                        if (item.quantity <= 1) {
-                          setDisableDecrement(true);
-                        }
-                        mappingPrice();
-                      }
-                    });
-                  };
-
                   return (
-                    <View key={item.id}>
-                      <ItemInCart
-                        Product_name={item.product_name}
-                        Description={item.description}
-                        Price={item.price}
-                        source={{ uri: item.image_url }}
-                        Quantity={item.quantity}
-                        Sub_total={item.sub_total}
-                        setValueQuantity={setQuantity}
-                        disableDecrement={decrementDisable}
-                        onChangeTextQuantity={(text) => setQuantity(text)}
-                        onPressIncrement={() => incrementQuantity(item.id)}
-                        onPressDecrement={() => decrementQuantity(item.id)}
-                        onPressremoveCart={() => {
-                          removeInCart();
-                          onRefresh();
+                    <View key={item.id} style={{ borderBottomWidth: 0.5 }}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          width: "100%",
+                          // borderBottomWidth: 2,
+                          paddingVertical: "2%",
+                          marginTop: "2%",
                         }}
-                      />
+                      >
+                        <View style={{ flex: 1, marginLeft: "2%" }}>
+                          <Image
+                            source={{ uri: item.image_url }}
+                            style={{ height: 50 }}
+                          />
+                        </View>
+                        <View
+                          style={{
+                            flex: 3,
+                            marginHorizontal: "5%",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold" }}>
+                            {item.product_name}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 3,
+                            marginLeft: "2%",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold" }}>
+                            {item.quantity} x
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 2,
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold" }}>
+                            {item.sub_total}
+                          </Text>
+                        </View>
+                      </View>
                     </View>
                   );
                 })}
-              </>
-            )}
 
-            {showGtotalCheckOut ? (
-              <></>
-            ) : (
-              <>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    borderBottomWidth: 1,
-                    marginHorizontal: "2%",
-                    marginTop: "2%",
-                  }}
-                >
-                  <Text
+                <View>
+                  <View
                     style={{
-                      fontWeight: "bold",
                       marginHorizontal: "2%",
-                      flex: 3,
-                      fontSize: 19,
-                    }}
-                    setValue={setGrandTotal}
-                    onChangeText={(text) => setGrandTotal(text)}
-                  >
-                    TOTAL:
-                  </Text>
-                  <Text style={{ flex: 1, fontSize: 19, fontWeight: "bold" }}>
-                    {grandTotal}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={{
-                    alignSelf: "center",
-                    backgroundColor: "#0079FF",
-                    width: "95%",
-                    alignItems: "center",
-                    borderRadius: 5,
-                    marginVertical: "3%",
-                  }}
-                  onPress={() => {
-                    setShowCheckOut(true);
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      fontSize: 20,
-                      marginVertical: "3%",
-                      color: "white",
+                      flexDirection: "row",
+                      marginVertical: "2%",
+                      borderBottomWidth: 1,
+                      paddingVertical: "2%",
                     }}
                   >
-                    CHECK OUT
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </ScrollView>
-        {showCheckOut ? (
-          <>
-            <View
-              style={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                zIndex: 2,
-                backgroundColor: "white",
-                paddingTop: "8%",
-              }}
-            >
-              <ScrollView>
-                <View style={{ flexDirection: "row" }}>
-                  <View style={{ flex: 1 }}>
-                    <TouchableOpacity
-                      style={{
-                        width: "10%",
-                        alignItems: "center",
-                        marginHorizontal: "1%",
-                        justifyContent: "center",
-                      }}
-                      onPress={() => {
-                        setShowCheckOut(false);
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontWeight: "600",
-                          fontSize: 14,
-                        }}
-                      >
-                        <Entypo name="chevron-small-left" size={45} />
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={{ width: "100%", marginVertical: "1%" }}>
-                  <View>
                     <Text
                       style={{
-                        marginVertical: "2%",
-                        marginLeft: "3%",
-                        fontSize: 20,
-                        fontWeight: "600",
+                        fontWeight: "bold",
+                        fontSize: 18,
+                        flex: 1,
                       }}
                     >
-                      Billing Details
+                      Total:
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontWeight: "600",
+                        fontSize: 18,
+                        marginHorizontal: "2%",
+                      }}
+                    >
+                      {grandTotal}
                     </Text>
                   </View>
-                  <TextInput
-                    onChangeText={(text) => setFullname(text)}
-                    setValue={setFullname}
-                    value={fullname}
-                    placeholder="Fullname"
+                  <TouchableOpacity
                     style={{
-                      marginHorizontal: "3%",
+                      alignSelf: "center",
+                      backgroundColor: "#0079FF",
+                      width: "95%",
+                      alignItems: "center",
+                      borderRadius: 5,
+                      marginTop: "4%",
                       marginBottom: "2%",
-                      backgroundColor: "white",
                     }}
-                    mode="outlined"
-                    theme={{ colors: { text: "white", primary: "black" } }}
-                  />
-                  <TextInput
-                    onChangeText={(text) => setContactNo(text)}
-                    value={contact}
-                    setValue={setContactNo}
-                    placeholder="Contact no."
-                    style={{
-                      marginHorizontal: "3%",
-                      marginBottom: "2%",
-                      backgroundColor: "white",
+                    onPress={() => {
+                      placeOder();
                     }}
-                    mode="outlined"
-                    theme={{ colors: { text: "white", primary: "black" } }}
-                    inputMode="numeric"
-                    maxLength={11}
-                  />
-                </View>
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginLeft: "2%",
-                  }}
-                >
-                  <View>
-                    <RadioButton
-                      theme={{ colors: { text: "white", primary: "#0A6EBD" } }}
-                      value="first"
-                      status={checked === "first" ? "checked" : "unchecked"}
-                      onPress={() => {
-                        setChecked("first");
-                        setDeliverPickup(false);
-
-                        if (deliverPickup == true) {
-                          setAddress("");
-                          setPaymentMethod("Deliver");
-                        }
-                      }}
-                    />
-                  </View>
-                  <View style={{ justifyContent: "center" }}>
-                    <Text>Deliver</Text>
-                  </View>
-                  <View>
-                    <RadioButton
-                      theme={{ colors: { text: "white", primary: "#0A6EBD" } }}
-                      value="second"
-                      status={checked === "second" ? "checked" : "unchecked"}
-                      onPress={() => {
-                        setChecked("second");
-                        setDeliverPickup(true);
-                        if (deliverPickup == false) {
-                          setAddress(
-                            "3rd Floor , Dona Pacita Building beside PureGold Paniqui, Tarlac, Philippines"
-                          );
-                          setPaymentMethod("Pickup");
-                        }
-                      }}
-                    />
-                  </View>
-                  <View style={{ justifyContent: "center" }}>
-                    <Text>Pickup</Text>
-                  </View>
-                </View>
-                <View>
-                  {deliverPickup ? (
-                    <>
-                      <Text
-                        style={{
-                          color: "grey",
-                          alignSelf: "center",
-                          borderWidth: 0.5,
-                          padding: "3%",
-                          borderRadius: 5,
-                          backgroundColor: "#ebebeb",
-                          fontWeight: "600",
-                        }}
-                        mode="outlined"
-                        editable={false}
-                        label="Address"
-                        setValue={setAddress}
-                        onChangeText={(text) => setAddress(text)}
-                      >
-                        {address}
-                      </Text>
-                    </>
-                  ) : (
-                    <>
-                      <TextInput
-                        style={{
-                          marginHorizontal: "2%",
-                          height: 70,
-                          marginVertical: "3%",
-                          backgroundColor: "white",
-                        }}
-                        mode="outlined"
-                        label="Address"
-                        value={address}
-                        setValue={setAddress}
-                        onChangeText={(text) => setAddress(text)}
-                        theme={{ colors: { text: "white", primary: "black" } }}
-                      />
-                    </>
-                  )}
-                </View>
-                <View>
-                  {cart.map((item) => {
-                    return (
-                      <View key={item.id} style={{ borderBottomWidth: 0.5 }}>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            width: "100%",
-                            // borderBottomWidth: 2,
-                            paddingVertical: "2%",
-                            marginTop: "2%",
-                          }}
-                        >
-                          <View style={{ flex: 1, marginLeft: "2%" }}>
-                            <Image
-                              source={{ uri: item.image_url }}
-                              style={{ height: 50 }}
-                            />
-                          </View>
-                          <View
-                            style={{
-                              flex: 3,
-                              marginHorizontal: "5%",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Text style={{ fontWeight: "bold" }}>
-                              {item.product_name}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flex: 3,
-                              marginLeft: "2%",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Text style={{ fontWeight: "bold" }}>
-                              {item.quantity} x
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flex: 2,
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Text style={{ fontWeight: "bold" }}>
-                              {item.sub_total}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  })}
-
-                  <View>
-                    <View
+                  >
+                    <Text
                       style={{
-                        marginHorizontal: "2%",
-                        flexDirection: "row",
-                        marginVertical: "2%",
-                        borderBottomWidth: 1,
-                        paddingVertical: "2%",
+                        fontWeight: "bold",
+                        fontSize: 20,
+                        marginVertical: "3%",
+                        color: "white",
                       }}
                     >
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                          fontSize: 18,
-                          flex: 1,
-                        }}
-                      >
-                        Total:
-                      </Text>
-
-                      <Text
-                        style={{
-                          fontWeight: "600",
-                          fontSize: 18,
-                          marginHorizontal: "2%",
-                        }}
-                      >
-                        {grandTotal}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      style={{
-                        alignSelf: "center",
-                        backgroundColor: "#0079FF",
-                        width: "95%",
-                        alignItems: "center",
-                        borderRadius: 5,
-                        marginTop: "4%",
-                        marginBottom: "2%",
-                      }}
-                      onPress={() => {
-                        placeOder();
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                          fontSize: 20,
-                          marginVertical: "3%",
-                          color: "white",
-                        }}
-                      >
-                        PLACE ORDER
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                      PLACE ORDER
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              </ScrollView>
-            </View>
-          </>
-        ) : (
-          <></>
-        )}
-      </View>
+              </View>
+            </ScrollView>
+          </View>
+        </>
+      ) : (
+        <></>
+      )}
     </View>
   );
 };
