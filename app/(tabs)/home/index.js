@@ -19,7 +19,7 @@ const Tab1Index = () => {
 
   useEffect(() => {
     getData(function (callback) {
-      fetch("https://gymerls-api-xi.vercel.app/api/meal-plan", {
+      fetch("https://gymerls-api-staging.vercel.app/api/meal-plan", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

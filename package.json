@@ -7,6 +7,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@babel/helper-module-transforms": "^7.22.9",
+    "@babel/runtime": "^7.22.6",
     "@expo-google-fonts/encode-sans-semi-condensed": "^0.2.3",
     "@react-native-async-storage/async-storage": "1.17.11",
     "expo": "~48.0.18",

@@ -43,7 +43,7 @@ const Item = () => {
   useEffect(() => {
     // GET METHOD
     // console.log(product);
-    fetch("https://gymerls-api-xi.vercel.app/api/products")
+    fetch("https://gymerls-api-staging.vercel.app/api/products")
       .then(function (response) {
         return response.json();
       })
@@ -52,7 +52,7 @@ const Item = () => {
       });
 
     storeDataUser(function (callback) {
-      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
+      fetch("https://gymerls-api-staging.vercel.app/api/get-cart-by-id", {
         method: "POST",
         headers: {
           "Content-type": " application/json",
@@ -77,7 +77,7 @@ const Item = () => {
   const addToCart = (product_name, image_url, description, price, id) => {
     const addedDate = formatDate(new Date());
     if (id === id) {
-      fetch("https://gymerls-api-xi.vercel.app/api/add-to-cart", {
+      fetch("https://gymerls-api-staging.vercel.app/api/add-to-cart", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -149,9 +149,9 @@ const Item = () => {
                         paddingVertical: "2%",
                         borderTopWidth: 1,
                         borderBottomWidth: 1,
-                        borderColor: "black",
                         marginVertical: 1,
                         backgroundColor: "#fff",
+                        borderColor: "grey",
                       }}
                     >
                       <Text
@@ -165,9 +165,9 @@ const Item = () => {
                     <View>
                       <Text
                         style={{
-                          paddingLeft: "1%",
+                          paddingLeft: "2%",
                           backgroundColor: "#F9F9F9",
-                          fontWeight: "bold",
+                          fontWeight: "500",
                         }}
                       >
                         {product.description}
@@ -175,12 +175,14 @@ const Item = () => {
                     </View>
                     <Text
                       style={{
-                        paddingLeft: "1%",
+                        paddingLeft: "2%",
+                        paddingVertical: "2%",
+                        color: "#023047",
                         backgroundColor: "#F9F9F9",
-                        fontWeight: "bold",
+                        fontWeight: "700",
                       }}
                     >
-                      Price: {product.price}
+                      ₱ {product.price}
                     </Text>
 
                     <CustomAddToCart

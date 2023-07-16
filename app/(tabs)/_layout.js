@@ -23,7 +23,7 @@ const TabsLayout = () => {
           title: "Home",
           tabBarIcon: () => (
             <Text>
-              <Entypo name="home" size={30} color="black" />
+              <Entypo name="home" size={26} color="grey" />
             </Text>
           ),
         }}
@@ -34,7 +34,7 @@ const TabsLayout = () => {
           title: "Meal",
           tabBarIcon: () => (
             <Text>
-              <MaterialIcons name="set-meal" size={30} color="black" />
+              <MaterialIcons name="set-meal" size={26} color="grey" />
             </Text>
           ),
         }}
@@ -45,7 +45,7 @@ const TabsLayout = () => {
           title: "store",
           tabBarIcon: () => (
             <Text>
-              <Entypo name="shop" size={30} color="black" />
+              <Entypo name="shop" size={26} color="grey" />
             </Text>
           ),
         }}
@@ -56,7 +56,18 @@ const TabsLayout = () => {
           title: "Product",
           tabBarIcon: () => (
             <Text>
-              <Entypo name="shopping-cart" size={30} color="black" />
+              <Entypo name="shopping-cart" size={26} color="grey" />
+            </Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="orders"
+        options={{
+          title: "orders",
+          tabBarIcon: () => (
+            <Text>
+              <Entypo name="shopping-bag" size={26} color="grey" />
             </Text>
           ),
         }}
@@ -67,7 +78,7 @@ const TabsLayout = () => {
           title: "Schedule",
           tabBarIcon: () => (
             <Text>
-              <FontAwesome name="calendar" size={24} color="black" />
+              <FontAwesome name="calendar" size={26} color="grey" />
             </Text>
           ),
         }}
@@ -78,7 +89,7 @@ const TabsLayout = () => {
           title: "Settings",
           tabBarIcon: () => (
             <Text>
-              <Ionicons name="settings" size={30} color="black" />
+              <Ionicons name="settings" size={26} color="grey" />
             </Text>
           ),
         }}

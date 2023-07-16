@@ -39,10 +39,12 @@ const Tab5Index = () => {
   const [username, setUsername] = useState("");
   const [show, setShow] = useState("");
   const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshingAdd, setRefreshingAdd] = React.useState(false);
+  const [showAddress, setShowAddress] = useState(false);
   const [address, setAddress] = useState("");
   const [fullname, setFullname] = useState("");
   const [contact, setContactNo] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Deliver");
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -50,17 +52,28 @@ const Tab5Index = () => {
       setRefreshing(false);
     }, 2000);
   }, []);
-  useEffect(() => {
-    if (cart.length == []) {
+
+  const onAddToCartRefresh = React.useCallback(() => {
+    setRefreshingAdd(true);
+    setTimeout(() => {
+      setRefreshingAdd(false);
+    }, 2000);
+  }, []);
+
+  const findValue = (result) => {
+    onAddToCartRefresh(result);
+    if (result.length == []) {
       setShowNo(true);
       setShowGtotalCheckOut(true);
     } else {
-      setShowGtotalCheckOut(false);
       setShowNo(false);
+      setShowGtotalCheckOut(false);
     }
+  };
 
+  useEffect(() => {
     getData(function (callback) {
-      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
+      fetch("https://gymerls-api-staging.vercel.app/api/get-cart-by-id", {
         method: "POST",
         headers: {
           "Content-type": " application/json",
@@ -72,8 +85,10 @@ const Tab5Index = () => {
       })
         .then((res) => res.json())
         .then((result) => {
-          mappingPrice();
           setCart(result);
+          findValue(result);
+          onLoadMappingPrice(result);
+          onAddToCartRefresh(result);
         });
     });
   }, [refreshing]);
@@ -91,6 +106,13 @@ const Tab5Index = () => {
   const [newCart, setNewCart] = useState([]);
   const [item, setItem] = useState("");
 
+  const onLoadMappingPrice = (result) => {
+    let t = 0;
+    result.map(({ sub_total }) => (t = t + sub_total));
+    setGrandTotal(t);
+    return t;
+  };
+
   const mappingPrice = () => {
     let t = 0;
     cart.map(({ sub_total }) => (t = t + sub_total));
@@ -99,7 +121,7 @@ const Tab5Index = () => {
   };
 
   const deleteCartItemAfterCheckout = (id) => {
-    fetch("https://gymerls-api-xi.vercel.app/api/delete-cart", {
+    fetch("https://gymerls-api-staging.vercel.app/api/delete-cart", {
       method: "PATCH",
       headers: {
         "Content-type": "application/json",
@@ -139,10 +161,10 @@ const Tab5Index = () => {
       }
 
       var newItem = JSON.stringify(newCart).replace(/\[|\]/g, "");
-      var replaceItem = newItem.replace(/"/g, "");
+      var replaceItem = newItem.replace(/"/g, "  ");
       const transactionDate = formatDate(new Date());
 
-      fetch("https://gymerls-api-xi.vercel.app/api/transaction", {
+      fetch("https://gymerls-api-staging.vercel.app/api/transaction", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -165,16 +187,9 @@ const Tab5Index = () => {
           setShowCheckOut(false);
           onRefresh();
           alert("Transaction success");
-          console.log(result);
+          // console.log(result);
         });
     }
-
-    // console.log(replaceItem);
-    // console.log(fullname);
-    // console.log(contact);
-    // console.log(paymentMethod);
-    // console.log(address);
-    // console.log(grandTotal);
   };
 
   return (
@@ -208,7 +223,7 @@ const Tab5Index = () => {
                     onPress={() => {
                       router.replace("../store");
                     }}
-                    style={{ marginTop: "2%" }}
+                    style={{ marginTop: "2%", backgroundColor: "#0A6EBD" }}
                     mode="contained"
                   >
                     Shop Now
@@ -219,15 +234,18 @@ const Tab5Index = () => {
               <>
                 {cart.map((item) => {
                   const removeInCart = () => {
-                    fetch("https://gymerls-api-xi.vercel.app/api/delete-cart", {
-                      method: "PATCH",
-                      headers: {
-                        "Content-type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        id: item.id,
-                      }),
-                    }).then(function (response) {
+                    fetch(
+                      "https://gymerls-api-staging.vercel.app/api/delete-cart",
+                      {
+                        method: "PATCH",
+                        headers: {
+                          "Content-type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          id: item.id,
+                        }),
+                      }
+                    ).then(function (response) {
                       return response.json();
                     });
                   };
@@ -276,7 +294,10 @@ const Tab5Index = () => {
                         onChangeTextQuantity={(text) => setQuantity(text)}
                         onPressIncrement={() => incrementQuantity(item.id)}
                         onPressDecrement={() => decrementQuantity(item.id)}
-                        onPressremoveCart={() => removeInCart()}
+                        onPressremoveCart={() => {
+                          removeInCart();
+                          onRefresh();
+                        }}
                       />
                     </View>
                   );
@@ -288,18 +309,30 @@ const Tab5Index = () => {
               <></>
             ) : (
               <>
-                <Text
+                <View
                   style={{
-                    fontWeight: "bold",
-                    marginTop: "2%",
-                    marginHorizontal: "2%",
+                    flexDirection: "row",
                     borderBottomWidth: 1,
+                    marginHorizontal: "2%",
+                    marginTop: "2%",
                   }}
-                  setValue={setGrandTotal}
-                  onChangeText={(text) => setGrandTotal(text)}
                 >
-                  Grand Total: {grandTotal}
-                </Text>
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginHorizontal: "2%",
+                      flex: 3,
+                      fontSize: 19,
+                    }}
+                    setValue={setGrandTotal}
+                    onChangeText={(text) => setGrandTotal(text)}
+                  >
+                    TOTAL:
+                  </Text>
+                  <Text style={{ flex: 1, fontSize: 19, fontWeight: "bold" }}>
+                    {grandTotal}
+                  </Text>
+                </View>
                 <TouchableOpacity
                   style={{
                     alignSelf: "center",
@@ -307,7 +340,7 @@ const Tab5Index = () => {
                     width: "95%",
                     alignItems: "center",
                     borderRadius: 5,
-                    marginTop: "4%",
+                    marginVertical: "3%",
                   }}
                   onPress={() => {
                     setShowCheckOut(true);
@@ -319,7 +352,6 @@ const Tab5Index = () => {
                       fontSize: 20,
                       marginVertical: "3%",
                       color: "white",
-                      marginBottom: "2%",
                     }}
                   >
                     CHECK OUT
@@ -443,7 +475,9 @@ const Tab5Index = () => {
                         setChecked("second");
                         setDeliverPickup(true);
                         if (deliverPickup == false) {
-                          setAddress("kanto school");
+                          setAddress(
+                            "3rd Floor , Dona Pacita Building beside PureGold Paniqui, Tarlac, Philippines"
+                          );
                           setPaymentMethod("Pickup");
                         }
                       }}
@@ -456,22 +490,24 @@ const Tab5Index = () => {
                 <View>
                   {deliverPickup ? (
                     <>
-                      <TextInput
+                      <Text
                         style={{
-                          marginHorizontal: "2%",
-                          height: 70,
-                          marginVertical: "3%",
-                          color: "black",
-                          backgroundColor: "white",
+                          color: "grey",
+                          alignSelf: "center",
+                          borderWidth: 0.5,
+                          padding: "3%",
+                          borderRadius: 5,
+                          backgroundColor: "#ebebeb",
+                          fontWeight: "600",
                         }}
                         mode="outlined"
                         editable={false}
                         label="Address"
-                        value={address}
                         setValue={setAddress}
                         onChangeText={(text) => setAddress(text)}
-                        theme={{ colors: { text: "white", primary: "black" } }}
-                      />
+                      >
+                        {address}
+                      </Text>
                     </>
                   ) : (
                     <>
@@ -483,12 +519,10 @@ const Tab5Index = () => {
                           backgroundColor: "white",
                         }}
                         mode="outlined"
-                        // setValue={setUsername}
                         label="Address"
                         value={address}
                         setValue={setAddress}
                         onChangeText={(text) => setAddress(text)}
-                        // onChangeText={(text) => setUsername(text)}
                         theme={{ colors: { text: "white", primary: "black" } }}
                       />
                     </>
@@ -537,7 +571,7 @@ const Tab5Index = () => {
                           </View>
                           <View
                             style={{
-                              flex: 1,
+                              flex: 2,
                               justifyContent: "center",
                             }}
                           >

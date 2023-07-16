@@ -78,7 +78,7 @@ const Tab2Index = () => {
       if (currentPassword === newPassword) {
         alert("New password must not be same as your old password");
       } else if (newPassword.length >= 6) {
-        fetch("https://gymerls-api-xi.vercel.app/api/update-password", {
+        fetch("https://gymerls-api-staging.vercel.app/api/update-password", {
           method: "PATCH",
           headers: {
             "Content-type": "application/json",
@@ -318,14 +318,13 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "absolute",
     backgroundColor: "#fff",
-    elevation: 500,
+    elevation: 20,
     alignItems: "center",
     width: "65%",
     // height: "16%",
     borderRadius: 5,
     top: "40%",
     zIndex: 1,
-    borderWidth: 0.5,
     borderColor: "grey",
   },
   buttonconfirmcontainer: {
@@ -337,11 +336,13 @@ const styles = StyleSheet.create({
   textcancel: {
     marginHorizontal: "2%",
     fontSize: 20,
+    color: "blue",
   },
   textout: {
     marginHorizontal: "2%",
     fontSize: 20,
-    borderColor: "red",
+    color: "red",
+    // borderColor: "red",
   },
   changepassitem: {
     borderColor: "grey",

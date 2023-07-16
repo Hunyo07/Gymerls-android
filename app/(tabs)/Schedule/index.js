@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React from "react";
 
 const Scheduleindex = () => {
@@ -6,6 +6,10 @@ const Scheduleindex = () => {
     <View>
       <View style={styles.mealcontainer}>
         <Text style={styles.headertext}>SCHEDULE</Text>
+      </View>
+
+      <View>
+        <ScrollView></ScrollView>
       </View>
     </View>
   );

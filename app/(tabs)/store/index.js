@@ -26,7 +26,7 @@ const Tab5Index = () => {
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
-  }, []);
+  }, [refreshing]);
   return (
     <View>
       <ScrollView

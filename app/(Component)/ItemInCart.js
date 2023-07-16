@@ -66,7 +66,7 @@ const ItemInCart = ({
     // GET METHOD
 
     getData(function (callback) {
-      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
+      fetch("https://gymerls-api-staging.vercel.app/api/get-cart-by-id", {
         method: "POST",
         headers: {
           "Content-type": " application/json",
@@ -122,46 +122,6 @@ const ItemInCart = ({
         </>
       ) : (
         <>
-          {/* {cart.map((item) => { */}
-          {}
-          {/* const removeInCart = () => {
-              fetch("https://gymerls-api-xi.vercel.app/api/delete-cart", {
-                method: "PATCH",
-                headers: {
-                  "Content-type": "application/json",
-                },
-                body: JSON.stringify({
-                  id: item.id,
-                }),
-              }).then(function (response) {
-                return response.json();
-              });
-            }; */}
-          {/* const incrementQuantity = (id) => {
-              console.log(grandTotal);
-              onGrandTransfer(grandTotal);
-              cart.map((item) => {
-                if (id === item.id) {
-                  setQuantity(item.quantity++);
-                  setSubTotals((item.sub_total = item.quantity * item.price));
-                  mappingPrice();
-               
-                }
-              });
-            };
-
-            const decrementQuantity = (id) => {
-              onGrandTransfer(grandTotal);
-           
-              cart.map((item) => {
-                if (id === item.id) {
-                  setQuantity(item.quantity--);
-                  setSubTotals((item.sub_total = item.quantity * item.price));
-                  mappingPrice();
-                }
-              });
-            }; */}
-          {/* return ( */}
           <View
             style={{
               width: "90%",
@@ -219,15 +179,15 @@ const ItemInCart = ({
                   </Text>
                   <Text
                     style={{
-                      fontWeight: "bold",
+                      fontWeight: "500",
                       marginBottom: "2%",
                       marginLeft: "2%",
                     }}
                   >
-                    Price: {Price}
+                    ₱ {Price}
                   </Text>
                   <View style={{ width: "100%", paddingHorizontal: "2%" }}>
-                    <Pressable
+                    <TouchableOpacity
                       style={{
                         padding: "2%",
                         borderRadius: 10,
@@ -239,12 +199,8 @@ const ItemInCart = ({
                       }}
                       onPress={onPressIncrement}
                     >
-                      {/* () => {
-                              incrementQuantity(item.id);
-                            } */}
-
                       <Entypo name="plus" size={16} color="white" />
-                    </Pressable>
+                    </TouchableOpacity>
                     <Text
                       style={{
                         paddingHorizontal: "4%",
@@ -253,11 +209,10 @@ const ItemInCart = ({
                       }}
                       setValue={setValueQuantity}
                       onChangeText={onChangeTextQuantity}
-                      // (text) => setQuantity(text)
                     >
                       {Quantity}
                     </Text>
-                    <Pressable
+                    <TouchableOpacity
                       style={{
                         padding: "2%",
                         borderRadius: 10,
@@ -270,11 +225,8 @@ const ItemInCart = ({
                       disabled={disableDecrement}
                       onPress={onPressDecrement}
                     >
-                      {/* () => {
-                              decrementQuantity(item.id);
-                            } */}
                       <Entypo name="minus" size={16} color="white" />
-                    </Pressable>
+                    </TouchableOpacity>
                   </View>
                   <Text
                     style={{
@@ -284,15 +236,12 @@ const ItemInCart = ({
                     }}
                     setValue={setValueSubTotal}
                     onChangeText={onChangeTextSubtotal}
-                    // (text) => setSubTotals(text)
                   >
                     Total: {Sub_total}
                   </Text>
 
-                  {/* <CartItemComputation Price={item.price} /> */}
                   <TouchableOpacity
                     onPress={onPressremoveCart}
-                    // () => removeInCart()
                     style={{
                       backgroundColor: "#0079FF",
                       alignItems: "center",
@@ -313,8 +262,6 @@ const ItemInCart = ({
               </Card>
             </View>
           </View>
-          {/* ); */}
-          {/* })} */}
         </>
       )}
     </View>

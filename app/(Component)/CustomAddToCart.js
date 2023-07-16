@@ -1,10 +1,5 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React, { useState, useEffect } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { TouchableOpacity } from "react-native";
-import { Button } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomAddToCart = ({ text, onPress }) => {
@@ -14,8 +9,12 @@ const CustomAddToCart = ({ text, onPress }) => {
   const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
+    if (cartItem.length == []) {
+      setIsDisabled(false);
+      setPressed(false);
+    }
     storeDataUser(function (callback) {
-      fetch("https://gymerls-api-xi.vercel.app/api/get-cart-by-id", {
+      fetch("https://gymerls-api-staging.vercel.app/api/get-cart-by-id", {
         method: "POST",
         headers: {
           "Content-type": " application/json",
@@ -28,11 +27,9 @@ const CustomAddToCart = ({ text, onPress }) => {
         .then((res) => res.json())
         .then((result) => {
           setCartItem(result);
-          // console.log(result);
         });
-      // console.log(cartItem);
     });
-  }, [cartItem]);
+  }, []);
 
   const storeDataUser = async (callback) => {
     const valueUsername = await AsyncStorage.getItem("username");
@@ -47,7 +44,7 @@ const CustomAddToCart = ({ text, onPress }) => {
   // console.log(cartItem);
   const addToCart = () => {
     setIsDisabled(true);
-    // console.log("na press padin");
+    setPressed(true);
   };
 
   return (
@@ -59,8 +56,7 @@ const CustomAddToCart = ({ text, onPress }) => {
           //   borderRadius: 2,
           //   alignItems: "center",
           // }}
-          onPressOut={() => {
-            setPressed(true);
+          onPressIn={() => {
             addToCart();
           }}
           disabled={isDisable}
