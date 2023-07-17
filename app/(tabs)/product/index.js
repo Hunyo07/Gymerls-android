@@ -207,7 +207,7 @@ const Tab5Index = () => {
 
         <View
           style={{
-            backgroundColor: "#1D5D9B",
+            // backgroundColor: "#1D5D9B",
             borderRadius: 5,
             width: "98%",
             alignSelf: "center",

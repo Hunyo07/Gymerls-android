@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     flex: 4,
   },
   weekcontainer: {
-    backgroundColor: "#1D5D9B",
+    // backgroundColor: "#1D5D9B",
     borderRadius: 5,
     width: "98%",
     alignSelf: "center",
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 13,
     justifyContent: "space-evenly",
-    elevation: 3,
+    // elevation: 3,
   },
   icon: {
     marginVertical: 15,
