@@ -85,7 +85,7 @@ const Tab4Index = () => {
             </View>
             <View style={styles.card}>
               <Text style={styles.breakfasttext}>
-                <MaterialIcons name="free-breakfast" size={26} color="black" />{" "}
+                <MaterialIcons name="free-breakfast" size={26} color="#444" />{" "}
                 BREAK FAST
               </Text>
               <CustomInput
@@ -95,7 +95,7 @@ const Tab4Index = () => {
                 value={meals.sun_bf_meal}
               />
               <Text style={styles.breakfasttext}>
-                <MaterialIcons name="lunch-dining" size={26} color="black" />{" "}
+                <MaterialIcons name="lunch-dining" size={26} color="#444" />{" "}
                 LUNCH
               </Text>
               <CustomInput
@@ -104,7 +104,7 @@ const Tab4Index = () => {
                 value={meals.sun_lunch_meal}
               />
               <Text style={styles.breakfasttext}>
-                <MaterialIcons name="dinner-dining" size={26} color="black" />{" "}
+                <MaterialIcons name="dinner-dining" size={26} color="#444" />{" "}
                 DINNER
               </Text>
               <CustomInput

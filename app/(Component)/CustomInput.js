@@ -10,38 +10,39 @@ const CustomInput = ({
 }) => {
   return (
     <View style={styles.container}>
-      <TextInput
-        value={value}
+      <Text
         onChangeText={setValue}
         placeholder={placeholder}
         style={styles.input}
         secureTextEntry={secureTextEntry}
         editable={editable}
         // right={right}
-      />
+      >
+        {value}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    justifyContent: "center",
     width: "100%",
   },
   input: {
     width: "90%",
     borderWidth: 1,
     borderColor: "#A0A0A0",
-    height: 50,
-    backgroundColor: "#fff",
+    padding: "2%",
     borderRadius: 5,
     alignSelf: "center",
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     marginVertical: 10,
-    color: "black",
     borderLeftWidth: 0,
     borderRightWidth: 0,
     borderTopWidth: 0,
-    fontSize: 20,
+    fontSize: 18,
+    backgroundColor: "#ebebeb",
   },
 });
 

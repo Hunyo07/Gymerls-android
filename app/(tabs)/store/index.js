@@ -28,24 +28,23 @@ const Tab5Index = () => {
     }, 2000);
   }, [refreshing]);
   return (
-    <View>
+    <View style={{ flex: 1 }}>
+      <View style={styles.mealcontainer}>
+        <Text style={styles.headertext}>STORE</Text>
+      </View>
       <ScrollView
         style={styles.root}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={styles.mealcontainer}>
-          <Text style={styles.headertext}>STORE</Text>
-        </View>
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-evenly",
-            // backgroundColor: "#1D5D9B",
             borderRadius: 5,
             width: "98%",
-            alignSelf: "center",
+            // alignSelf: "center",
             marginTop: "2%",
           }}
         >
@@ -66,14 +65,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     width: "98%",
-    backgroundColor: "#023047",
+    backgroundColor: "white",
     marginTop: "10%",
     padding: 10,
     borderRadius: 10,
+    elevation: 10,
   },
   headertext: {
     fontSize: 30,
-    color: "#fff",
+    color: "#444",
     fontWeight: 700,
   },
   item: {

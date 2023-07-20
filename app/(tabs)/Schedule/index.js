@@ -1,10 +1,18 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  RefreshControl,
+} from "react-native";
 import React from "react";
-import { DatePickerModal, tr } from "react-native-paper-dates";
+import { DatePickerModal, es, tr } from "react-native-paper-dates";
 import { Button, List } from "react-native-paper";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DatePickerInput } from "react-native-paper-dates";
-import { RefreshControl } from "react-native";
+const { width } = Dimensions.get("window");
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   IconButton,
@@ -14,7 +22,8 @@ import {
 } from "react-native-paper";
 import { TouchableOpacity } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { en, registerTranslation } from "react-native-paper-dates";
 
 registerTranslation("en", en);
@@ -28,49 +37,89 @@ const Scheduleindex = () => {
   const [username, setUsername] = useState("");
   const [reservationData, setReservationData] = useState([]);
   const [showAddNewReserve, setAddNewReserve] = useState(false);
-  const [showSchedules, setShowSchedules] = useState(false);
-  const [filter, setFilter] = useState("ALL");
-
+  const [showSchedules, setShowSchedules] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [newReservationData, setNewReservationData] = useState([]);
+  const [membershipType, setMembershipType] = useState("");
   const [firstBatchIsDisabled, setFirstBatchIsDisabled] = useState(true);
   const [secondBatchIsDisabled, setSecondBatchIsDisabled] = useState(true);
   const [thirdBatchIsDisabled, setThirdBatchIsDisabled] = useState(true);
   const [fourthBatchIsDisabled, setFourthBatchIsDisabled] = useState(true);
   const [fifthBatchIsDisabled, setFifthBatchIsDisabled] = useState(true);
   const [lastBatchIsDisabled, setLastBatchIsDisabled] = useState(true);
+  const [showSchedByMemberTypeShip, setShowSchedByMemberTypeShip] =
+    useState(true);
+
   const [refreshing, setRefreshing] = React.useState(false);
   const [coachName, setCoachName] = useState("");
   const [notes, setNotes] = useState("");
   const [timeList, setTimeList] = useState("Select Option");
 
+  const citiesDropdownRef = useRef();
+
   const onRefresh = React.useCallback(() => {
-    // dateSetter();
+    setFilterStatus("All");
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-    }, 2000);
+    }, 1000);
   }, []);
 
-  // console.log(secondBatchIsDisabled);
-  // const formattedDateValue = dateValue.length.slice(0, 8);
-  // console.log(items);
-  // console.log(reservationData);
   const onDismissSingle = React.useCallback(() => {
+    onFilterStatus();
     onRefresh();
     setOpenCalendar(false);
   }, [setOpenCalendar]);
 
   const onConfirmSingle = React.useCallback(
     (params) => {
+      onFilterStatus();
       onRefresh();
       setOpenCalendar(false);
       setDateValue(params.date);
     },
     [setOpenCalendar, setDateValue]
   );
+  const setterFilterOptions = [
+    "All",
+    "Pending",
+    "Confirmed",
+    "Cancelled",
+    "Declined",
+    "Completed",
+  ];
+
+  const getUserData = async (membership_type) => {
+    try {
+      const value = await AsyncStorage.getItem("username");
+      if (value !== null) {
+        setMembershipType(value);
+        membership_type(value);
+      } else {
+      }
+    } catch (e) {}
+  };
+
   useEffect(() => {
-    // const timer = setTimeout(() => {
     var formattedDate = formatDate(dateValue);
-    // var formattedDate = inputDate;
+
+    getUserData(function (membership_type) {
+      fetch("https://gymerls-api-staging.vercel.app/api/get-user-by-username", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: membership_type,
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          res[0].membership_type !== "Premium"
+            ? setShowSchedByMemberTypeShip(false)
+            : setShowSchedByMemberTypeShip(true);
+        });
+    });
     getData(function (callback) {
       fetch(
         "https://gymerls-api-staging.vercel.app/api/get-reservation-by-username-and-date",
@@ -87,21 +136,32 @@ const Scheduleindex = () => {
       )
         .then((response) => response.json())
         .then((data) => {
-          setReservationData(data);
-          if (data.length === 0) {
-            setShowSchedules(true);
-          } else {
-            setShowSchedules(false);
+          if (filterStatus === "All") {
+            setNewReservationData(data);
+            reservationData.length !== 0
+              ? setShowSchedules(false)
+              : setShowSchedules(true);
           }
+          setReservationData(data);
         });
     });
-    // setIsLoading(false);
-    // }, 1000);
-    // return () => clearTimeout(timer);
-  }, [refreshing]);
+  }, [refreshing, reservationData]);
 
-  // var formattedDateFilter = formatDate(dateValue);
-  // console.log(formattedDateFilter);
+  const onFilterStatus = (selectedItem) => {
+    const newData = reservationData.filter((item) => {
+      return item.status === selectedItem;
+    });
+    if (selectedItem == "All") {
+      onRefresh();
+    }
+    setNewReservationData(newData);
+    if (newData.length === 0) {
+      setShowSchedules(true);
+    } else {
+      setShowSchedules(false);
+    }
+  };
+
   const handleOpenModalCreateReservation = () => {
     getReservationByDate(inputDate);
   };
@@ -113,7 +173,9 @@ const Scheduleindex = () => {
       ? alert("Please fill up the following fields")
       : timeList === "Select Option"
       ? alert("Please Select Option")
-      : createReservation();
+      : formatDate(new Date()) <= formatDate(inputDate)
+      ? createReservation()
+      : alert("Cannot make reservation on " + formatDate(inputDate));
   };
 
   const createReservation = () => {
@@ -141,8 +203,6 @@ const Scheduleindex = () => {
   };
 
   const getReservationByDate = () => {
-    // var formattedDate = formatDate(new Date());
-
     var formattedDate = formatDate(inputDate);
     fetch(
       "https://gymerls-api-staging.vercel.app/api/get-reservation-by-date-and-status-is-confirmed",
@@ -158,15 +218,12 @@ const Scheduleindex = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        // console.log(data);
-
         var first_batch = [];
         var second_batch = [];
         var third_batch = [];
         var fourth_batch = [];
         var fifth_batch = [];
         var last_batch = [];
-        // console.log(data);
 
         for (let item of data) {
           if (item.time_slot === "7-9AM") {
@@ -183,9 +240,6 @@ const Scheduleindex = () => {
             last_batch.push(item);
           }
         }
-        // console.log(second_batch);
-        // console.log(first_batch.length);
-        // console.log(second_batch.length);
 
         first_batch.length === 10
           ? setFirstBatchIsDisabled(true)
@@ -242,19 +296,10 @@ const Scheduleindex = () => {
     setExpanded(false);
   };
 
-  // const dateSetter = () => {
   var dateFIlter = formatDate(dateValue);
-  //   // console.log(dateFIlter);
-  // };
-
-  // console.log();
-
-  {
-    reservationData.map((res) => {});
-  }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -263,263 +308,299 @@ const Scheduleindex = () => {
         <View style={styles.mealcontainer}>
           <Text style={styles.headertext}>SCHEDULE</Text>
         </View>
-
-        <View
-          style={{ justifyContent: "center", flex: 1, alignItems: "center" }}
-        >
-          <DatePickerModal
-            locale="en"
-            mode="single"
-            visible={openCalendar}
-            onDismiss={onDismissSingle}
-            date={dateValue}
-            onConfirm={onConfirmSingle}
-          />
-        </View>
-        <View
-          style={{
-            borderRadius: 5,
-            width: "98%",
-            alignSelf: "center",
-            marginTop: "2%",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "white",
-              borderRadius: 5,
-              elevation: 10,
-              paddingVertical: "2%",
-              justifyContent: "space-evenly",
-            }}
-          >
+        {showSchedByMemberTypeShip ? (
+          <>
             <View
               style={{
-                // flex: 1,
-                // marginLeft: "2%",
                 justifyContent: "center",
+                flex: 1,
+                alignItems: "center",
               }}
             >
-              <Button
-                style={{
-                  // width: "70%",
-                  backgroundColor: "white",
-                  borderWidth: 0.5,
-                }}
-                mode="outlined"
-                icon="plus"
-                textColor="black"
-                size={24}
-                onPress={() => {
-                  setAddNewReserve(true);
-                  handleOpenModalCreateReservation();
-                }}
-              >
-                SCHEDULE
-              </Button>
+              <DatePickerModal
+                locale="en"
+                mode="single"
+                visible={openCalendar}
+                onDismiss={onDismissSingle}
+                date={dateValue}
+                onConfirm={onConfirmSingle}
+              />
             </View>
             <View
               style={{
-                // flex: 1,
-                justifyContent: "center",
-                // alignItems: "flex-end",
-                // marginLeft: "5%",
+                borderRadius: 5,
+                width: "100%",
+                alignSelf: "center",
+                marginTop: "2%",
               }}
             >
-              <Button
-                mode="outlined"
-                textColor="black"
-                icon="filter-variant"
-                iconColor="black"
-                size={24}
-                onPress={() => console.log("Pressed")}
-              >
-                {filter}
-              </Button>
-            </View>
-            <View
-              style={{
-                // flex: 1,
-                justifyContent: "center",
-              }}
-            >
-              <Button
-                mode="outlined"
-                textColor="black"
-                backgroundColor="white"
-                icon="calendar"
-                size={24}
-                onPress={() => setOpenCalendar(true)}
-              >
-                {dateFIlter}
-              </Button>
-            </View>
-            {/* <Text>ADD NEW RESERVATION</Text> */}
-          </View>
-          {showSchedules ? (
-            <>
               <View
                 style={{
-                  alignItems: "center",
-                  marginTop: "20%",
+                  flexDirection: "row",
+                  backgroundColor: "white",
+                  borderRadius: 5,
+                  elevation: 10,
+                  paddingVertical: "2%",
+                  marginBottom: "5%",
+                  justifyContent: "space-evenly",
                 }}
               >
-                <Text
-                  style={{ fontSize: 16, fontWeight: "bold", color: "grey" }}
+                <View
+                  style={{
+                    justifyContent: "center",
+                  }}
                 >
-                  No data to show/.
-                </Text>
+                  <Button
+                    style={{
+                      backgroundColor: "white",
+                      borderWidth: 1,
+                      borderColor: "grey",
+                    }}
+                    mode="outlined"
+                    icon="plus"
+                    textColor="black"
+                    size={24}
+                    onPress={() => {
+                      setAddNewReserve(true);
+                      handleOpenModalCreateReservation();
+                    }}
+                  >
+                    Sched
+                  </Button>
+                </View>
+                <View
+                  style={{
+                    justifyContent: "center",
+                  }}
+                >
+                  <SelectDropdown
+                    data={setterFilterOptions}
+                    onSelect={(selectedItem, index) => {
+                      setFilterStatus(selectedItem);
+                      onFilterStatus(selectedItem);
+                    }}
+                    defaultButtonText={"All"}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return filterStatus;
+                      // return selectedItem;
+                    }}
+                    defaultValueByIndex={0}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    buttonStyle={styles.dropdown1BtnStyle}
+                    buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                    renderDropdownIcon={(isOpened) => {
+                      return (
+                        <FontAwesome
+                          name={isOpened ? "chevron-up" : "chevron-down"}
+                          color={"#444"}
+                          size={18}
+                        />
+                      );
+                    }}
+                    dropdownIconPosition={"right"}
+                    dropdownStyle={styles.dropdown1DropdownStyle}
+                    rowTextStyle={styles.dropdown1RowTxtStyle}
+                  />
+                </View>
+                <View
+                  style={{
+                    justifyContent: "center",
+                  }}
+                >
+                  <Button
+                    style={{
+                      backgroundColor: "white",
+                      borderWidth: 1,
+                      borderColor: "grey",
+                    }}
+                    mode="outlined"
+                    textColor="black"
+                    backgroundColor="white"
+                    icon="calendar"
+                    size={24}
+                    onPress={() => setOpenCalendar(true)}
+                  >
+                    {dateFIlter}
+                  </Button>
+                </View>
               </View>
-            </>
-          ) : (
-            <>
-              <View style={{}}>
-                {reservationData.map((res) => {
-                  return (
-                    <View key={res.id} style={{ paddingTop: "2%" }}>
-                      <View
-                        style={{
-                          marginTop: "2%",
-                          width: "15%",
-                          marginRight: "13%",
-                          alignSelf: "flex-end",
-                          backgroundColor: "#fff",
-                          borderTopLeftRadius: 5,
-                          borderTopRightRadius: 5,
-                          elevation: 20,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            padding: "5%",
-                            // color: "white",
-                            fontSize: 14,
-                            alignSelf: "center",
-                            fontWeight: "700",
-                          }}
-                        >
-                          {res.time_slot}
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          width: "90%",
-                          flexDirection: "row",
-                          alignSelf: "center",
-                          marginBottom: "5%",
-                        }}
-                      >
-                        <View
-                          style={{
-                            flex: 1,
-                            elevation: 10,
-                            backgroundColor: "#1687A7",
-                            padding: "3%",
-                            borderBottomLeftRadius: 10,
-                            borderTopLeftRadius: 10,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontWeight: "700",
-                              fontSize: 26,
-                              color: "#FEFCF3",
-                              alignSelf: "center",
-                            }}
-                          >
-                            {res.reservation_date.slice(8, 10)}
-                          </Text>
-                          <Text
-                            style={{
-                              fontWeight: "500",
-                              fontSize: 10,
-                              color: "#ffff",
-                              alignSelf: "center",
-                            }}
-                          >
-                            {res.reservation_date.slice(0, 7)}
-                          </Text>
-                          {/* <Text
+              {showSchedules ? (
+                <>
+                  <View
+                    style={{
+                      alignItems: "center",
+                      marginTop: "20%",
+                    }}
+                  >
+                    <Text
                       style={{
-                        fontWeight: "500",
-                        fontSize: 10,
-                        color: "#ffff",
-                        alignSelf: "center",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: "grey",
                       }}
                     >
-                      {res.time_slot}
-                    </Text> */}
-                        </View>
-                        <View
-                          style={{
-                            elevation: 10,
-                            flex: 4,
-                            padding: "2%",
-                            backgroundColor: "#FFFFFF",
-                          }}
-                        >
-                          <Text
+                      No data to show/.
+                    </Text>
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View>
+                    {newReservationData.map((res) => {
+                      return (
+                        <View key={res.id} style={{ paddingTop: "2%" }}>
+                          <View
                             style={{
-                              fontWeight: "bold",
-                              fontSize: 14,
-                              margin: "2%",
-                            }}
-                          >
-                            {res.notes}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              fontWeight: "500",
-                              color: "grey",
-                              // alignSelf:"flex-start"
-                            }}
-                          >
-                            {res.coach_name}
-                          </Text>
-                        </View>
-                        <View
-                          style={[
-                            res.status,
-                            res.status === "Pending"
-                              ? styles.pending
-                              : res.status === "Confirmed"
-                              ? styles.confirmed
-                              : res.status === "Cancelled"
-                              ? styles.cancelled
-                              : res.status === "Completed"
-                              ? styles.completed
-                              : styles.declined,
-                            // res.status === "Completed"
-                            //   ? styles.completed
-                            //   : styles.cancelled
-                          ]}
-                        >
-                          <Text
-                            style={{
+                              width: "90%",
+                              flexDirection: "row",
                               alignSelf: "center",
-                              color: "#ffff",
-                              fontWeight: "500",
+                              marginBottom: "5%",
                             }}
                           >
-                            {res.status}
-                          </Text>
+                            <View
+                              style={{
+                                flex: 1,
+                                elevation: 10,
+                                backgroundColor: "#1687A7",
+                                padding: "3%",
+                                borderBottomLeftRadius: 10,
+                                borderTopLeftRadius: 10,
+                                justifyContent: "center",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontWeight: "700",
+                                  fontSize: 30,
+                                  color: "#FEFCF3",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                {res.reservation_date.slice(8, 10)}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: 10,
+                                  color: "#ffff",
+                                  alignSelf: "center",
+                                }}
+                              >
+                                {res.reservation_date.slice(0, 7)}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontSize: 10,
+                                  color: "#444",
+                                  alignSelf: "center",
+                                  fontWeight: "700",
+                                }}
+                              >
+                                {res.time_slot}
+                              </Text>
+                            </View>
+                            <View
+                              style={{
+                                elevation: 10,
+                                flex: 4,
+                                padding: "2%",
+                                backgroundColor: "#FFFFFF",
+                                flexDirection: "column",
+                              }}
+                            >
+                              <View
+                                style={{ flex: 4, justifyContent: "center" }}
+                              >
+                                <Text
+                                  style={{
+                                    fontWeight: "bold",
+                                    fontSize: 14,
+                                    margin: "2%",
+                                  }}
+                                >
+                                  {res.notes}
+                                </Text>
+                              </View>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  borderTopWidth: 1,
+                                  borderColor: "grey",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                    fontWeight: "600",
+                                    color: "#444",
+                                  }}
+                                >
+                                  {res.coach_name}
+                                </Text>
+                              </View>
+                            </View>
+                            {/* </View> */}
+                            <View
+                              style={[
+                                res.status,
+                                res.status === "Pending"
+                                  ? styles.pending
+                                  : res.status === "Confirmed"
+                                  ? styles.confirmed
+                                  : res.status === "Cancelled"
+                                  ? styles.cancelled
+                                  : res.status === "Completed"
+                                  ? styles.completed
+                                  : styles.declined,
+                              ]}
+                            >
+                              <Text
+                                style={{
+                                  alignSelf: "center",
+                                  color: "#ffff",
+
+                                  fontFamily: "EncodeSansSemiCondensed_700Bold",
+                                  letterSpacing: 1,
+                                }}
+                              >
+                                {res.status}
+                              </Text>
+                            </View>
+                          </View>
                         </View>
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            </>
-          )}
-        </View>
+                      );
+                    })}
+                  </View>
+                </>
+              )}
+            </View>
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginVertical: "20%",
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "EncodeSansSemiCondensed_700Bold",
+                  fontSize: 18,
+                  color: "grey",
+                }}
+              >
+                Upgrade to premuim now!
+              </Text>
+            </View>
+          </>
+        )}
       </ScrollView>
-      {/* <SelectList
-        setSelected={(val) => setSelected(val)}
-        data={data}
-        save="value"
-      /> */}
+
       {showAddNewReserve ? (
         <>
           <View
@@ -528,7 +609,8 @@ const Scheduleindex = () => {
               width: "100%",
               zIndex: 1,
               backgroundColor: "transparent",
-              marginTop: "25%",
+              marginVertical: "20%",
+              elevation: 500,
             }}
           >
             <View
@@ -538,6 +620,7 @@ const Scheduleindex = () => {
                 borderRadius: 5,
                 backgroundColor: "white",
                 width: "90%",
+                marginVertical: "20%",
                 alignSelf: "center",
               }}
             >
@@ -729,6 +812,7 @@ const Scheduleindex = () => {
                 style={{
                   flexDirection: "row",
                   zIndex: -10,
+                  marginVertical: "4%",
                 }}
               >
                 <View
@@ -743,7 +827,9 @@ const Scheduleindex = () => {
                       cancelFunctionSchedule();
                     }}
                   >
-                    <Text>CANCEL</Text>
+                    <Text style={{ fontWeight: 600, color: "#444" }}>
+                      CANCEL
+                    </Text>
                     {/* <Entypo name="chevron-small-left" size={45} /> */}
                   </TouchableOpacity>
                 </View>
@@ -759,7 +845,9 @@ const Scheduleindex = () => {
                       createSchedule();
                     }}
                   >
-                    <Text>CREATE</Text>
+                    <Text style={{ fontWeight: 600, color: "#444" }}>
+                      CREATE
+                    </Text>
                     {/* <Entypo name="chevron-small-left" size={45} /> */}
                   </TouchableOpacity>
                 </View>
@@ -791,7 +879,7 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   pending: {
-    backgroundColor: "#FF7700",
+    backgroundColor: "#ed6c02",
     flex: 2,
     justifyContent: "center",
     borderBottomRightRadius: 10,
@@ -803,11 +891,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#1A5D1A",
+    backgroundColor: "#2e7d32",
     elevation: 10,
   },
   completed: {
-    backgroundColor: "#3AB0FF",
+    backgroundColor: "#1976d2",
     flex: 2,
     justifyContent: "center",
     borderBottomRightRadius: 10,
@@ -819,7 +907,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#C21010",
+    backgroundColor: "#d32f2f",
     elevation: 10,
   },
   declined: {
@@ -827,7 +915,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: "#95389E",
+    backgroundColor: "#9c27b0",
     elevation: 10,
   },
   listItem: { fontSize: 12, fontWeight: "800", zIndex: 10 },
@@ -837,5 +925,46 @@ const styles = StyleSheet.create({
     color: "grey",
     zIndex: 10,
   },
+
+  dropdown1BtnStyle: {
+    width: 134,
+    // flex: 5,
+    height: 43,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "grey",
+  },
+  dropdown1BtnTxtStyle: {
+    color: "black",
+    textAlign: "left",
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  dropdown1DropdownStyle: {
+    backgroundColor: "white",
+    borderRadius: 5,
+  },
+  // dropdown1RowStyle: {
+  //   backgroundColor: "#EFEFEF",
+  //   borderBottomColor: "#C5C5C5",
+  // },
+  dropdown1RowTxtStyle: { color: "#444", textAlign: "left", fontWeight: "500" },
+  // divider: { width: 12 },
+  // dropdown2BtnStyle: {
+  //   flex: 1,
+  //   height: 50,
+  //   backgroundColor: "#FFF",
+  //   // borderRadius: 8,
+  //   borderWidth: 1,
+  //   borderColor: "#444",
+  // },
+  // dropdown2BtnTxtStyle: { color: "#444", textAlign: "left" },
+  // dropdown2DropdownStyle: { backgroundColor: "#EFEFEF" },
+  // dropdown2RowStyle: {
+  //   backgroundColor: "#EFEFEF",
+  //   borderBottomColor: "#C5C5C5",
+  // },
+  // dropdown2RowTxtStyle: { color: "#444", textAlign: "left" },
 });
 export default Scheduleindex;

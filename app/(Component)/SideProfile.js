@@ -48,9 +48,19 @@ const SideProfile = () => {
         })
         .then(function (personinfo) {
           setPersonInfo(personinfo);
+          var membership_type = personinfo[0].membership_type;
+          storeDataMembership_type(membership_type);
         });
     });
   }, []);
+
+  const storeDataMembership_type = async (membership_type) => {
+    try {
+      await AsyncStorage.setItem("membership_type", membership_type);
+    } catch (e) {
+      // saving error
+    }
+  };
 
   const getData = async (callback) => {
     try {

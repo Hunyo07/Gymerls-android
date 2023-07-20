@@ -45,6 +45,7 @@ const Tab5Index = () => {
   const [fullname, setFullname] = useState("");
   const [contact, setContactNo] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Deliver");
+  const [loadOnAdd, setLoadOnAdd] = useState([]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -85,6 +86,7 @@ const Tab5Index = () => {
       })
         .then((res) => res.json())
         .then((result) => {
+          setLoadOnAdd(result);
           setCart(result);
           findValue(result);
           onLoadMappingPrice(result);
@@ -131,9 +133,7 @@ const Tab5Index = () => {
       }),
     })
       .then((res) => res.json())
-      .then((result) => {
-        // alert("Cart item deleted");
-      });
+      .then((result) => {});
   };
   const formatDate = (date) => {
     var dateToFormat = new Date(date);
@@ -193,7 +193,10 @@ const Tab5Index = () => {
   };
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
+      <View style={styles.mealcontainer}>
+        <Text style={styles.headertext}>CART</Text>
+      </View>
       <ScrollView
         style={styles.root}
         contentContainerStyle={styles.scrollView}
@@ -201,10 +204,6 @@ const Tab5Index = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={styles.mealcontainer}>
-          <Text style={styles.headertext}>CART</Text>
-        </View>
-
         <View
           style={{
             // backgroundColor: "#1D5D9B",
@@ -332,6 +331,7 @@ const Tab5Index = () => {
                     marginHorizontal: "2%",
                     flex: 3,
                     fontSize: 19,
+                    color: "#444",
                   }}
                   setValue={setGrandTotal}
                   onChangeText={(text) => setGrandTotal(text)}
@@ -343,6 +343,7 @@ const Tab5Index = () => {
                     flex: 1,
                     fontSize: 19,
                     fontWeight: "bold",
+                    color: "#444",
                   }}
                 >
                   {grandTotal}
@@ -672,14 +673,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     width: "98%",
-    backgroundColor: "#023047",
+    backgroundColor: "white",
     marginTop: "10%",
     padding: 10,
     borderRadius: 10,
+    elevation: 10,
   },
   headertext: {
     fontSize: 30,
-    color: "#fff",
+    color: "#444",
     fontWeight: 700,
   },
 });

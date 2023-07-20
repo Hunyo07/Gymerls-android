@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { IconButton, Colors } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 const ItemInCart = ({
   Quantity,
   onPressDecrement,
@@ -126,6 +126,7 @@ const ItemInCart = ({
             style={{
               width: "90%",
               alignSelf: "center",
+              flex: 1,
             }}
           >
             <View
@@ -146,9 +147,9 @@ const ItemInCart = ({
                     width: "100%",
                     alignItems: "center",
                     paddingVertical: "2%",
-                    borderTopWidth: 1,
-                    borderBottomWidth: 1,
-                    borderColor: "black",
+                    borderTopWidth: 0.5,
+                    borderBottomWidth: 0.5,
+                    borderColor: "#444",
                     marginVertical: 1,
                     backgroundColor: "#fff",
                   }}
@@ -173,60 +174,70 @@ const ItemInCart = ({
                       paddingLeft: "2%",
                       fontWeight: "bold",
                       marginVertical: "2%",
+                      color: "#444",
                     }}
                   >
                     {Description}
                   </Text>
-                  <Text
-                    style={{
-                      fontWeight: "500",
-                      marginBottom: "2%",
-                      marginLeft: "2%",
-                    }}
-                  >
-                    ₱ {Price}
-                  </Text>
-                  <View style={{ width: "100%", paddingHorizontal: "2%" }}>
-                    <TouchableOpacity
+                  <View style={{}}>
+                    <View style={{ marginBottom: "2%", marginLeft: "2%" }}>
+                      <Text
+                        style={{
+                          fontWeight: "700",
+                          color: "#023047",
+                        }}
+                      >
+                        ₱ {Price}
+                      </Text>
+                    </View>
+                    <View
                       style={{
-                        padding: "2%",
-                        borderRadius: 10,
-                        backgroundColor: "#0A6EBD",
-                        width: "10%",
-                        alignItems: "center",
-
-                        justifyContent: "center",
+                        width: "100%",
+                        paddingHorizontal: "2%",
+                        flexDirection: "row",
                       }}
-                      onPress={onPressIncrement}
                     >
-                      <Entypo name="plus" size={16} color="white" />
-                    </TouchableOpacity>
-                    <Text
-                      style={{
-                        paddingHorizontal: "4%",
-                        fontWeight: "bold",
-                        paddingVertical: "1%",
-                      }}
-                      setValue={setValueQuantity}
-                      onChangeText={onChangeTextQuantity}
-                    >
-                      {Quantity}
-                    </Text>
-                    <TouchableOpacity
-                      style={{
-                        padding: "2%",
-                        borderRadius: 10,
-                        backgroundColor: "#0A6EBD",
-                        width: "10%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                      mode="contained"
-                      disabled={disableDecrement}
-                      onPress={onPressDecrement}
-                    >
-                      <Entypo name="minus" size={16} color="white" />
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        style={{
+                          padding: "2%",
+                          borderRadius: 5,
+                          backgroundColor: "#0A6EBD",
+                          width: "10%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        mode="contained"
+                        disabled={disableDecrement}
+                        onPress={onPressDecrement}
+                      >
+                        <Entypo name="minus" size={18} color="white" />
+                      </TouchableOpacity>
+                      <Text
+                        style={{
+                          paddingHorizontal: "4%",
+                          fontWeight: "bold",
+                          paddingVertical: "1%",
+                          fontSize: 16,
+                        }}
+                        setValue={setValueQuantity}
+                        onChangeText={onChangeTextQuantity}
+                      >
+                        {Quantity}
+                      </Text>
+                      <TouchableOpacity
+                        style={{
+                          padding: "2%",
+                          borderRadius: 5,
+                          backgroundColor: "#0A6EBD",
+                          width: "10%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        onPress={onPressIncrement}
+                      >
+                        <Entypo name="plus" size={18} color="white" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <Text
                     style={{
@@ -255,7 +266,12 @@ const ItemInCart = ({
                         fontFamily: "EncodeSansSemiCondensed_700Bold",
                       }}
                     >
-                      REMOVE
+                      REMOVE{" "}
+                      <MaterialCommunityIcons
+                        name="trash-can-outline"
+                        size={24}
+                        color="white"
+                      />
                     </Text>
                   </TouchableOpacity>
                 </View>

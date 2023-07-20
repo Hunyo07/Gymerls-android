@@ -1,20 +1,91 @@
 import { Link, Redirect, Stack, useRouter } from "expo-router";
-import { Pressable } from "react-native";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Pressable, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { block } from "react-native-reanimated";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, MD2Colors, Button } from "react-native-paper";
 import { FlatList } from "react-native-gesture-handler";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import React from "react";
 const Tab4Index = ({ disabled }) => {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [showError, setShowError] = useState(false);
   const [mealPlanning, setMealPlanning] = useState("");
-  const [show, setShow] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [mealToday, setMealToday] = useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+  const d = new Date();
+  let day = d.getDay();
+
+  const getterMealToday = (meals) => {
+    if (meals === 0) {
+      setMealToday([
+        "Please set your morning meal",
+        "Please set your lung meal",
+        "Please set your dinner meal",
+      ]);
+    } else {
+      day === 0
+        ? setMealToday([
+            meals[0].sat_bf_meal,
+            meals[0].sat_lunch_meal,
+            meals[0].sat_dinner_meal,
+          ])
+        : day === 1
+        ? setMealToday([
+            meals[0].mon_bf_meal,
+            meals[0].mon_lunch_meal,
+            meals[0].mon_dinner_meal,
+          ])
+        : day === 2
+        ? setMealToday([
+            meals[0].tue_bf_meal,
+            meals[0].tue_lunch_meal,
+            meals[0].tue_dinner_meal,
+          ])
+        : day === 3
+        ? setMealToday([
+            meals[0].wed_bf_meal,
+            meals[0].wed_lunch_meal,
+            meals[0].wed_dinner_meal,
+          ])
+        : day === 4
+        ? setMealToday([
+            meals[0].thurs_bf_meal,
+            meals[0].thurs_lunch_meal,
+            meals[0].thurs_dinner_meal,
+          ])
+        : day === 5
+        ? setMealToday([
+            meals[0].fri_bf_meal,
+            meals[0].fri_lunch_meal,
+            meals[0].fri_dinner_meal,
+          ])
+        : setMealToday([
+            meals[0].sun_bf_meal,
+            meals[0].sun_lunch_meal,
+            meals[0].sun_dinner_meal,
+          ]);
+    }
+  };
 
   useEffect(() => {
     getData(function (callback) {
@@ -33,21 +104,14 @@ const Tab4Index = ({ disabled }) => {
         .then(function (meals) {
           if (meals.length === 0) {
             setShowError(true);
-            setShow(true);
-            setTimeout(() => {
-              setShow(false);
-            }, 300);
           } else {
-            setShow(true);
-            setTimeout(() => {
-              setShow(false);
-            }, 300);
             setShowError(false);
           }
           setMealPlanning(meals);
+          getterMealToday(meals);
         });
     });
-  }, []);
+  }, [refreshing]);
 
   const getData = async (callback) => {
     try {
@@ -62,126 +126,264 @@ const Tab4Index = ({ disabled }) => {
     }
   };
 
+  // console.log(mealToday[2]);
+
   return (
     <View style={styles.root}>
-      <View style={styles.activityindicator}>
-        <ActivityIndicator
-          animating={show}
-          size={"large"}
-          color={MD2Colors.grey900}
-        />
-      </View>
       <View style={styles.mealcontainer}>
         <Text style={styles.headertext}>MEAL PLAN</Text>
       </View>
-
-      <View style={styles.weekcontainer}>
-        {showError ? (
-          <>
-            <View>
-              <Text
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View
+          style={{
+            backgroundColor: "white",
+            marginHorizontal: "2%",
+            padding: "2%",
+            borderRadius: 5,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 5,
+              elevation: 5,
+              padding: "2%",
+              marginHorizontal: "1%",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: "EncodeSansSemiCondensed_600SemiBold",
+                marginHorizontal: "2%",
+              }}
+            >
+              Todays meal!
+            </Text>
+          </View>
+          <View style={{ margin: "2%" }}>
+            <View style={{ marginVertical: "2%" }}>
+              <View>
+                <Text style={{ fontSize: 18, fontWeight: 500, color: "#444" }}>
+                  <MaterialCommunityIcons
+                    name="coffee-outline"
+                    size={24}
+                    color="#444"
+                  />{" "}
+                  BREAK FAST
+                </Text>
+              </View>
+              <View
                 style={{
-                  fontFamily: "EncodeSansSemiCondensed_700Bold",
-                  color: "grey",
+                  backgroundColor: "#ebebeb",
+                  borderRadius: 4,
+                  padding: "2%",
+                  borderBottomWidth: 0.5,
                 }}
               >
-                It looks like you don't have meal plan yet.
-              </Text>
-              <Text
-                style={{
-                  fontFamily: "EncodeSansSemiCondensed_700Bold",
-                  color: "grey",
-                }}
-              >
-                Please contact your coach.
-              </Text>
+                <Text
+                  style={{
+                    fontWeight: 500,
+                    color: "#444",
+                    marginHorizontal: "2%",
+                  }}
+                >
+                  {mealToday[0]}
+                </Text>
+              </View>
             </View>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity
-              disabled={isDisabled}
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/sunday");
-              }}
-            >
-              <Text style={styles.text}>Sunday</Text>
-              <Text style={styles.icon}>
-                {" "}
-                <AntDesign name="rightcircleo" size={24} color="black" />{" "}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              leOpacity
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/monday");
-              }}
-            >
-              <Text style={styles.text}>Monday</Text>
-              <Text style={styles.icon}>
-                <AntDesign name="rightcircleo" size={24} color="black" />
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/tuesday");
-              }}
-            >
-              <Text style={styles.text}>Tuesday</Text>
-              <Text style={styles.icon}>
-                <AntDesign name="rightcircleo" size={24} color="black" />
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/wednesday");
-              }}
-            >
-              <Text style={styles.text}>Wednesday</Text>
-              <Text style={styles.icon}>
-                <AntDesign name="rightcircleo" size={24} color="black" />
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/thursday");
-              }}
-            >
-              <Text style={styles.text}>Thursday</Text>
-              <Text style={styles.icon}>
-                <AntDesign name="rightcircleo" size={24} color="black" />
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/friday");
-              }}
-            >
-              <Text style={styles.text}>Friday</Text>
-              <Text style={styles.icon}>
-                <AntDesign name="rightcircleo" size={24} color="black" />
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkcontainer}
-              onPress={() => {
-                router.push("../meal/saturday");
-              }}
-            >
-              <Text style={styles.text}>Saturday</Text>
-              <Text style={styles.icon}>
-                <AntDesign name="rightcircleo" size={24} color="black" />
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+            <View style={{ marginVertical: "2%" }}>
+              <View>
+                <Text style={{ fontSize: 18, fontWeight: 500, color: "#444" }}>
+                  <Ionicons
+                    name="ios-fast-food-outline"
+                    size={24}
+                    color="#444"
+                  />{" "}
+                  LUNCH
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: "#ebebeb",
+                  borderRadius: 4,
+                  padding: "2%",
+                  borderBottomWidth: 0.5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: 500,
+                    color: "#444",
+                    marginHorizontal: "2%",
+                  }}
+                >
+                  {mealToday[1]}
+                </Text>
+              </View>
+            </View>
+            <View style={{ marginVertical: "2%" }}>
+              <View>
+                <Text style={{ fontSize: 18, fontWeight: 500, color: "#444" }}>
+                  <MaterialIcons name="dinner-dining" size={24} color="#444" />{" "}
+                  DINNER
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: "#ebebeb",
+                  borderRadius: 4,
+                  padding: "2%",
+                  borderBottomWidth: 0.5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: 500,
+                    color: "#444",
+                    marginHorizontal: "2%",
+                  }}
+                >
+                  {mealToday[2]}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View style={styles.weekcontainer}>
+          {showError ? (
+            <>
+              <View>
+                <Text
+                  style={{
+                    fontFamily: "EncodeSansSemiCondensed_700Bold",
+                    color: "grey",
+                  }}
+                >
+                  It looks like you don't have meal plan yet.
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "EncodeSansSemiCondensed_700Bold",
+                    color: "grey",
+                  }}
+                >
+                  Please contact your coach.
+                </Text>
+              </View>
+            </>
+          ) : (
+            <>
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 5,
+                  elevation: 5,
+                  padding: "2%",
+                  marginHorizontal: "1%",
+                  width: "95%",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 22,
+                    fontFamily: "EncodeSansSemiCondensed_600SemiBold",
+                    marginHorizontal: "2%",
+                  }}
+                >
+                  Weekly meals!
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                disabled={isDisabled}
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/sunday");
+                }}
+              >
+                <Text style={styles.text}>Sunday</Text>
+                <Text style={styles.icon}>
+                  {" "}
+                  <AntDesign name="right" size={24} color="black" />{" "}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                leOpacity
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/monday");
+                }}
+              >
+                <Text style={styles.text}>Monday</Text>
+                <Text style={styles.icon}>
+                  <AntDesign name="right" size={24} color="#444" />
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/tuesday");
+                }}
+              >
+                <Text style={styles.text}>Tuesday</Text>
+                <Text style={styles.icon}>
+                  <AntDesign name="right" size={24} color="#444" />
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/wednesday");
+                }}
+              >
+                <Text style={styles.text}>Wednesday</Text>
+                <Text style={styles.icon}>
+                  <AntDesign name="right" size={24} color="#444" />
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/thursday");
+                }}
+              >
+                <Text style={styles.text}>Thursday</Text>
+                <Text style={styles.icon}>
+                  <AntDesign name="right" size={24} color="#444" />
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/friday");
+                }}
+              >
+                <Text style={styles.text}>Friday</Text>
+                <Text style={styles.icon}>
+                  <AntDesign name="right" size={24} color="#444" />
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.linkcontainer}
+                onPress={() => {
+                  router.push("../meal/saturday");
+                }}
+              >
+                <Text style={styles.text}>Saturday</Text>
+                <Text style={styles.icon}>
+                  <AntDesign name="right" size={24} color="#444" />
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -194,15 +396,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     width: "98%",
-    backgroundColor: "#023047",
+    backgroundColor: "white",
     marginTop: "10%",
     marginBottom: "2%",
     padding: 10,
     borderRadius: 10,
+    elevation: 10,
   },
   headertext: {
     fontSize: 30,
-    color: "#fff",
+    color: "#444",
     fontWeight: 700,
   },
   daystext: {
@@ -216,34 +419,32 @@ const styles = StyleSheet.create({
     // textAlign:'right',
   },
   linkcontainer: {
-    backgroundColor: "#fff",
-    width: "92%",
-    borderRadius: 10,
-    marginVertical: 8,
+    // backgroundColor: "#fff",
+    width: "95%",
     flexDirection: "row",
-    borderColor: "#fff",
-    borderWidth: 1,
-    elevation: 10,
+    borderColor: "grey",
+    borderBottomWidth: 0.5,
   },
   text: {
+    fontFamily: "EncodeSansSemiCondensed_700Bold",
     fontSize: 25,
     marginVertical: 10,
-    borderRadius: 10,
-    fontWeight: "bold",
+    color: "#444",
     marginLeft: 20,
-    width: "70%",
     flex: 4,
   },
   weekcontainer: {
-    // backgroundColor: "#1D5D9B",
-    borderRadius: 5,
-    width: "98%",
+    marginVertical: "3%",
+    backgroundColor: "#fff",
+    elevation: 10,
+    borderRadius: 10,
+    width: "95%",
     alignSelf: "center",
-    flex: 1,
+    // flex: 1,
     alignItems: "center",
     borderRadius: 10,
-    paddingVertical: 13,
-    justifyContent: "space-evenly",
+    paddingVertical: 15,
+    // justifyContent: "space-evenly",
     // elevation: 3,
   },
   icon: {
@@ -255,12 +456,6 @@ const styles = StyleSheet.create({
     flex: 2,
     marginRight: 20,
     // paddingVertical:3,
-  },
-  activityindicator: {
-    position: "absolute",
-    alignSelf: "center",
-    justifyContent: "center",
-    height: "100%",
   },
 });
 

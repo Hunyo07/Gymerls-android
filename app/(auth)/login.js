@@ -77,6 +77,7 @@ export default function LogIn() {
           } else {
             var password = userData[0].password;
             var username = userData[0].username;
+
             storeData(username);
             storeDataPass(password);
             router.replace("/(tabs)/home");
@@ -99,9 +100,7 @@ export default function LogIn() {
       .then(function (response) {
         return response.json();
       })
-      .then(function (userData) {
-        console.log(userData);
-      });
+      .then(function (userData) {});
   }, []);
 
   return (

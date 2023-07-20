@@ -5,6 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthStore } from "../../../store";
 import { useState, useEffect } from "react";
 import { Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 const orders = () => {
   const [username, setUsername] = useState("");
@@ -87,7 +90,7 @@ const orders = () => {
               {transaction.map((trans) => {
                 return (
                   <View key={trans.id} style={{}}>
-                    <View style={{ elevation: 20 }}>
+                    <View style={{}}>
                       <View
                         style={{
                           width: "90%",
@@ -97,6 +100,9 @@ const orders = () => {
                           borderRadius: 10,
                           padding: "2%",
                           backgroundColor: "#fff",
+                          elevation: 5,
+                          borderWidth: 0.5,
+                          borderColor: "#444",
                         }}
                       >
                         <View
@@ -109,6 +115,7 @@ const orders = () => {
                           <Text
                             style={{ marginVertical: "1%", fontWeight: "400" }}
                           >
+                            <Ionicons name="person" size={16} color="#444" />{" "}
                             {trans.fullname}
                           </Text>
                           <Text
@@ -137,6 +144,15 @@ const orders = () => {
                               color: "grey",
                             }}
                           >
+                            <MaterialCommunityIcons
+                              name={
+                                trans.method === "Deliver"
+                                  ? "truck-delivery-outline"
+                                  : "handshake-outline"
+                              }
+                              size={16}
+                              color="black"
+                            />{" "}
                             {trans.method}
                           </Text>
                           <Text
@@ -148,6 +164,7 @@ const orders = () => {
                               borderRadius: 2,
                             }}
                           >
+                            <Entypo name="address" size={16} color="#444" />{" "}
                             {trans.address}
                           </Text>
                         </View>
@@ -199,15 +216,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     width: "98%",
-    backgroundColor: "#023047",
+    backgroundColor: "white",
     marginTop: "10%",
     marginBottom: "2%",
     padding: 10,
     borderRadius: 10,
+    elevation: 10,
   },
   headertext: {
     fontSize: 30,
-    color: "#fff",
+    color: "#444",
     fontWeight: 700,
   },
   status: {
@@ -217,12 +235,12 @@ const styles = StyleSheet.create({
   pending: {
     padding: "4%",
     borderRadius: 5,
-    backgroundColor: "#FF7700",
+    backgroundColor: "#ed6c02",
   },
   confirmed: {
     padding: "4%",
 
-    backgroundColor: "#1A5D1A",
+    backgroundColor: "#2e7d32",
     borderRadius: 5,
   },
 });

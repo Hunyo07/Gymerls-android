@@ -19,6 +19,7 @@ export default function Layout() {
     EncodeSansSemiCondensed_400Regular,
     EncodeSansSemiCondensed_300Light,
     EncodeSansSemiCondensed_100Thin,
+    EncodeSansSemiCondensed_600SemiBold,
   });
 
   if (!fontsLoaded) {
