@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#fff",
     borderRadius: 100,
-    elevation: 6,
+    elevation: 100,
     alignItems: "center",
     marginHorizontal: 8,
   },
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginVertical: 20,
     padding: 10,
-    elevation: 10,
+    elevation: 600,
     borderRadius: 10,
   },
   headertext: {
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   card: {
-    width: "90%",
+    width: "95%",
     alignSelf: "center",
     backgroundColor: "#fff",
     borderRadius: 10,

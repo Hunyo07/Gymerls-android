@@ -43,14 +43,12 @@ const Tab4Index = () => {
     try {
       const value = await AsyncStorage.getItem("username");
       if (value !== null) {
-        // value previously stored
         setUsername(value);
         callback(value);
       } else {
         console.log("walang makuha boy!");
       }
     } catch (e) {
-      // error reading value
       console.log(e);
     }
   };
@@ -124,7 +122,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#fff",
     borderRadius: 100,
-    elevation: 6,
+    elevation: 100,
     marginHorizontal: 8,
   },
   elavation: {
@@ -135,7 +133,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     padding: 10,
     borderRadius: 10,
-    elevation: 10,
+    elevation: 600,
   },
   headertext: {
     fontSize: 30,
@@ -143,7 +141,7 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   card: {
-    width: "90%",
+    width: "95%",
     alignSelf: "center",
     backgroundColor: "#fff",
     borderRadius: 10,

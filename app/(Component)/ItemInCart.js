@@ -180,7 +180,14 @@ const ItemInCart = ({
                     {Description}
                   </Text>
                   <View style={{}}>
-                    <View style={{ marginBottom: "2%", marginLeft: "2%" }}>
+                    <View
+                      style={{
+                        marginBottom: "2%",
+                        marginLeft: "2%",
+                        borderBottomWidth: 0.5,
+                        borderColor: "#444",
+                      }}
+                    >
                       <Text
                         style={{
                           fontWeight: "700",
@@ -242,8 +249,12 @@ const ItemInCart = ({
                   <Text
                     style={{
                       fontWeight: "bold",
-                      marginVertical: "2%",
+                      margin: "2%",
                       paddingHorizontal: "2%",
+                      backgroundColor: "#bebebe",
+                      paddingBottom: "2%",
+                      paddingTop: "2%",
+                      borderRadius: 5,
                     }}
                     setValue={setValueSubTotal}
                     onChangeText={onChangeTextSubtotal}

@@ -1,10 +1,10 @@
 import { Tabs } from "expo-router";
-import {} from "react-native";
+import { React } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Text, TouchableRipple } from "react-native-paper";
+import { Text } from "react-native-paper";
 
 // 🏠
 // ⚙️

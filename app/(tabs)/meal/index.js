@@ -27,6 +27,7 @@ const Tab4Index = ({ disabled }) => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
+    getIpAddress();
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
@@ -113,21 +114,15 @@ const Tab4Index = ({ disabled }) => {
     });
   }, [refreshing]);
 
-  const getData = async (callback) => {
-    try {
-      const value = await AsyncStorage.getItem("username");
-      if (value !== null) {
-        setUsername(value);
-        callback(value);
-      } else {
-      }
-    } catch (e) {
-      console.log(e);
-    }
+  const getIpAddress = (callback) => {
+    fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => {
+        callback(data.ip);
+        console.log(data.ip);
+      })
+      .catch((error) => console.log(error));
   };
-
-  // console.log(mealToday[2]);
-
   return (
     <View style={styles.root}>
       <View style={styles.mealcontainer}>
