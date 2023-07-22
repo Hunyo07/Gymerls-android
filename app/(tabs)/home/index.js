@@ -7,9 +7,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import CustomInput from "../../(Component)/CustomInput";
-import SideProfile from "../../(Component)/SideProfile";
 import { ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { clockRunning } from "react-native-reanimated";
 
 const Tab1Index = () => {
   const router = useRouter();
@@ -92,22 +92,6 @@ const Tab1Index = () => {
       }
     } catch (e) {}
   };
-  //   const logOut = async () => {
-  //     AuthStore.update((s) => {
-  //       s.isLoggedIn = true;
-  //     });
-  //     router.replace("/login");
-  //     try {
-  //         await AsyncStorage.removeItem('username');
-  //         return true;
-  //     }
-  //     catch(exception) {
-  //         return false;
-  //     }
-  // }
-  // const onLogoutPressed = () =>{
-  //   console.warn('Logout');
-  // }
 
   return (
     <View>
@@ -121,14 +105,14 @@ const Tab1Index = () => {
             <View style={styles.togglebutton}>
               <TouchableOpacity
                 onPress={() => {
-                  router.push("../../(Component)/SideProfile");
+                  router.push("../home/profile");
                 }}
               >
                 <View style={styles.icon}>
                   <MaterialCommunityIcons
                     name="account-circle"
                     size={44}
-                    color="black"
+                    color="#444"
                   />
                 </View>
               </TouchableOpacity>

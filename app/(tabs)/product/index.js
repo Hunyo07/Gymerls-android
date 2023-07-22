@@ -22,6 +22,8 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Entypo } from "@expo/vector-icons";
+import * as Device from "expo-device";
+import * as Network from "expo-network";
 
 const Tab5Index = () => {
   const router = useRouter();
@@ -46,6 +48,59 @@ const Tab5Index = () => {
   const [contact, setContactNo] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Deliver");
   const [loadOnAdd, setLoadOnAdd] = useState([]);
+  const [ipAddress, setIpAdress] = useState("");
+
+  const getIpAddress = async (ipAddress) => {
+    try {
+      const ipAdd = await Network.getIpAddressAsync();
+      if (ipAdd !== null) {
+        setIpAdress(ipAdd);
+        ipAddress(ipAdd);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const userLogsOnPlaceOrder = (username) => {
+    console.log(username);
+    getIpAddress(function (ipAddress) {
+      fetch("https://gymerls-api-staging.vercel.app/api/insert-log", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          event_info: "Confirm - checkout",
+          ip_address: ipAddress,
+          platform: Device.osName,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+    });
+  };
+
+  const userLogdelcart = (event) => {
+    getIpAddress(function (ipAddress) {
+      fetch("https://gymerls-api-staging.vercel.app/api/insert-log", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          event_info: "delete - " + event + "in cart",
+          ip_address: ipAddress,
+          platform: Device.osName,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+    });
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -147,7 +202,6 @@ const Tab5Index = () => {
 
   const placeOder = () => {
     if (fullname == "" && contact == "") {
-      console.log("wala");
       alert("Please type your fullname or contact.no ");
     } else if (address == "") {
       alert("Please type your address ");
@@ -156,7 +210,6 @@ const Tab5Index = () => {
         deleteCartItemAfterCheckout(post.id);
       }
       for (let item of cart) {
-        // console.log(item.product_name);
         newCart.push(item.product_name);
       }
 
@@ -186,6 +239,8 @@ const Tab5Index = () => {
         .then((result) => {
           setShowCheckOut(false);
           onRefresh();
+          console.log(result);
+          userLogsOnPlaceOrder(username);
           alert("Transaction success");
           // console.log(result);
         });
@@ -222,6 +277,14 @@ const Tab5Index = () => {
                     color: "grey",
                   }}
                 >
+                  SCROLL DOWN TO RELOAD..
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "EncodeSansSemiCondensed_700Bold",
+                    color: "grey",
+                  }}
+                >
                   MAKE YOUR PURCHASE
                   <Ionicons name="cart-outline" size={24} color="grey" />.
                 </Text>
@@ -239,7 +302,7 @@ const Tab5Index = () => {
           ) : (
             <>
               {cart.map((item) => {
-                const removeInCart = () => {
+                const removeInCart = (product_name) => {
                   fetch(
                     "https://gymerls-api-staging.vercel.app/api/delete-cart",
                     {
@@ -251,9 +314,13 @@ const Tab5Index = () => {
                         id: item.id,
                       }),
                     }
-                  ).then(function (response) {
-                    return response.json();
-                  });
+                  )
+                    .then(function (response) {
+                      return response.json();
+                    })
+                    .then((e) => {
+                      userLogdelcart(product_name);
+                    });
                 };
 
                 const incrementQuantity = (id) => {
@@ -301,7 +368,7 @@ const Tab5Index = () => {
                       onPressIncrement={() => incrementQuantity(item.id)}
                       onPressDecrement={() => decrementQuantity(item.id)}
                       onPressremoveCart={() => {
-                        removeInCart();
+                        removeInCart(item.product_name);
                         onRefresh();
                       }}
                     />

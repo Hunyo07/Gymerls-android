@@ -75,36 +75,36 @@ const Tab4Index = () => {
           <View key={meals.id}>
             <View style={styles.elavation}>
               <Text style={styles.headertext}>SATURDAY</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.breakfasttext}>
-                <MaterialIcons name="free-breakfast" size={26} color="#444" />{" "}
-                BREAK FAST
-              </Text>
-              <CustomInput
-                placeholder="Morning"
-                editable={false}
-                style={styles.input}
-                value={meals.sat_bf_meal}
-              />
-              <Text style={styles.breakfasttext}>
-                <MaterialIcons name="lunch-dining" size={26} color="#444" />{" "}
-                LUNCH
-              </Text>
-              <CustomInput
-                placeholder="Afternoon"
-                editable={false}
-                value={meals.sat_lunch_meal}
-              />
-              <Text style={styles.breakfasttext}>
-                <MaterialIcons name="dinner-dining" size={26} color="#444" />{" "}
-                DINNER
-              </Text>
-              <CustomInput
-                placeholder="Dinner"
-                editable={false}
-                value={meals.sat_dinner_meal}
-              />
+              <View style={styles.card}>
+                <Text style={styles.breakfasttext}>
+                  <MaterialIcons name="free-breakfast" size={26} color="#444" />{" "}
+                  BREAK FAST
+                </Text>
+                <CustomInput
+                  placeholder="Morning"
+                  editable={false}
+                  style={styles.input}
+                  value={meals.sat_bf_meal}
+                />
+                <Text style={styles.breakfasttext}>
+                  <MaterialIcons name="lunch-dining" size={26} color="#444" />{" "}
+                  LUNCH
+                </Text>
+                <CustomInput
+                  placeholder="Afternoon"
+                  editable={false}
+                  value={meals.sat_lunch_meal}
+                />
+                <Text style={styles.breakfasttext}>
+                  <MaterialIcons name="dinner-dining" size={26} color="#444" />{" "}
+                  DINNER
+                </Text>
+                <CustomInput
+                  placeholder="Dinner"
+                  editable={false}
+                  value={meals.sat_dinner_meal}
+                />
+              </View>
             </View>
           </View>
         );
@@ -145,7 +145,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     paddingVertical: 10,
-    elevation: 10,
   },
   breakfasttext: {
     marginLeft: 20,

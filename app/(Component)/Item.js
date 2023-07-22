@@ -12,12 +12,15 @@ import {
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomAddToCart from "./CustomAddToCart";
+import * as Device from "expo-device";
+import * as Network from "expo-network";
 
 const Item = () => {
   const [product, setProducts] = useState([]);
   const [username, setUsername] = useState("");
   const [cartItem, setCartItem] = useState([]);
   const [isDisable, setAddToCartButtonIsDisabled] = useState(false);
+  const [ipAddress, setIpAdress] = useState("");
 
   const formatDate = (date) => {
     var dateToFormat = new Date(date);
@@ -40,9 +43,41 @@ const Item = () => {
     }
   };
 
+  const getIpAddress = async (ipAddress) => {
+    try {
+      const ipAdd = await Network.getIpAddressAsync();
+
+      if (ipAdd !== null) {
+        setIpAdress(ipAdd);
+        ipAddress(ipAdd);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const userLog = (username, event) => {
+    getIpAddress(function (ipAddress) {
+      fetch("https://gymerls-api-staging.vercel.app/api/insert-log", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          event_info: "Add - " + event + "in cart",
+          ip_address: ipAddress,
+          platform: Device.osName,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+    });
+  };
+
   useEffect(() => {
     // GET METHOD
-    // console.log(product);
     fetch("https://gymerls-api-staging.vercel.app/api/products")
       .then(function (response) {
         return response.json();
@@ -96,29 +131,16 @@ const Item = () => {
       })
         .then((res) => res.json())
         .then((result) => {
-          console.log(result);
+          userLog(username, product_name);
         });
     } else {
       console.log(error);
     }
   };
 
-  // const onPressOut = () => {
-  //   setAddToCartButtonIsDisabled(true);
-  // };
-
-  // var idNum = 1;
-
   return (
     <View style={{}}>
       {product.map((product) => {
-        {
-          /* if (idNum === product.id) {
-          console.log(product.product_name);
-        } else {
-        } */
-        }
-
         return (
           <View
             key={product.id}

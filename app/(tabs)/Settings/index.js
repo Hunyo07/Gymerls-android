@@ -15,6 +15,8 @@ import { useState, useEffect } from "react";
 import { Entypo } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TextInput } from "react-native-paper";
+import * as Network from "expo-network";
+import * as Device from "expo-device";
 
 const Tab2Index = () => {
   const router = useRouter();
@@ -27,6 +29,59 @@ const Tab2Index = () => {
   const [passwordVisibleNew, setPasswordVisibleNew] = useState(false);
   const [username, setUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [ipAddress, setIpAdress] = useState("");
+
+  const getIpAddress = async (ipAddress) => {
+    try {
+      const ipAdd = await Network.getIpAddressAsync();
+
+      if (ipAdd !== null) {
+        setIpAdress(ipAdd);
+        ipAddress(ipAdd);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const userLogOff = (username) => {
+    getIpAddress(function (ipAddress) {
+      fetch("https://gymerls-api-staging.vercel.app/api/insert-log", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          event_info: "Logoff - success",
+          ip_address: ipAddress,
+          platform: Device.osName,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+    });
+  };
+
+  const userLoveChangePassSuccess = (username) => {
+    getIpAddress(function (ipAddress) {
+      fetch("https://gymerls-api-staging.vercel.app/api/insert-log", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          event_info: "Update - password",
+          ip_address: ipAddress,
+          platform: Device.osName,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+    });
+  };
 
   const changePassItem = () => {
     setShowChangePass(true);
@@ -40,7 +95,8 @@ const Tab2Index = () => {
     setShowSignout(false);
   };
 
-  const logOut = async () => {
+  const logOut = async (username) => {
+    userLogOff(username);
     AuthStore.update((s) => {
       s.isLoggedIn = false;
     });
@@ -95,7 +151,9 @@ const Tab2Index = () => {
           s.isLoggedIn = false;
         });
         alert(" Change password complete Please sign in again");
+        userLogOff(username);
         router.replace("/login");
+        userLoveChangePassSuccess(username);
       } else {
         alert("password must be atleast 6 characters ");
       }
@@ -128,14 +186,14 @@ const Tab2Index = () => {
                     cancel();
                   }}
                 >
-                  <Text style={styles.textcancel}>Cancel</Text>
+                  <Text style={styles.textcancel}>CANCEL</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    logOut();
+                    logOut(username);
                   }}
                 >
-                  <Text style={styles.textout}>Signout</Text>
+                  <Text style={styles.textout}>SIGNOUT</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -261,16 +319,17 @@ const styles = StyleSheet.create({
   headercontainer: {
     alignSelf: "center",
     marginVertical: 40,
-    backgroundColor: "#023047",
+    backgroundColor: "#fff",
     width: "98%",
     alignItems: "center",
     paddingVertical: 10,
     borderRadius: 10,
+    elevation: 10,
   },
   headertext: {
     fontSize: 30,
-    color: "#fff",
     fontWeight: 700,
+    color: "#444",
   },
   sectioncontainer: {
     borderRadius: 10,
@@ -335,14 +394,23 @@ const styles = StyleSheet.create({
   },
   textcancel: {
     marginHorizontal: "2%",
-    fontSize: 20,
-    color: "blue",
+    fontSize: 18,
+    backgroundColor: "#1976D2",
+    borderRadius: 5,
+    alignSelf: "center",
+    padding: "2%",
+    color: "#fff",
+    fontWeight: "500",
   },
   textout: {
     marginHorizontal: "2%",
-    fontSize: 20,
-    color: "red",
-    // borderColor: "red",
+    fontSize: 18,
+    alignSelf: "center",
+    padding: "2%",
+    color: "#fff",
+    fontWeight: "500",
+    borderRadius: 5,
+    backgroundColor: "#1976D2",
   },
   changepassitem: {
     borderColor: "grey",

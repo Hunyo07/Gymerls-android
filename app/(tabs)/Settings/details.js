@@ -8,7 +8,6 @@ export default function Details() {
       <Stack.Screen options={{ title: "Detail Screen" }} />
       <Text
         onPress={() => {
-          // Go back to the previous screen using the imperative API.
           router.back();
         }}
       >

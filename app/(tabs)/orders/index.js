@@ -1,5 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  RefreshControl,
+  Dimensions,
+} from "react-native";
+import React, { useRef } from "react";
 import { ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthStore } from "../../../store";
@@ -8,11 +15,24 @@ import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-
+import { AntDesign } from "@expo/vector-icons";
+import SelectDropdown from "react-native-select-dropdown";
+const { width } = Dimensions.get("window");
 const orders = () => {
   const [username, setUsername] = useState("");
   const [transaction, setTransaction] = useState([]);
-  const [transactShow, setTransactShow] = useState(false);
+  const [transactShow, setTransactShow] = useState(true);
+  const [filterStatus, setFilterStatus] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [filteredTransaction, setFilteredTransaction] = useState([]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const formatDate = (date) => {
     var dateToFormat = new Date(date);
@@ -23,6 +43,8 @@ const orders = () => {
     var formattedDate = year + "-" + month + "-" + day;
     return formattedDate;
   };
+
+  const setterFilterOptions = ["All", "Pending", "Completed"];
   useEffect(() => {
     storeDataPass(function (callback) {
       fetch(
@@ -39,16 +61,22 @@ const orders = () => {
       )
         .then((response) => response.json())
         .then((data) => {
-          setTransaction(data);
-          if (data.length === []) {
+          if (data.length == []) {
             setTransactShow(true);
           } else {
             setTransactShow(false);
+            setFilterStatus("All");
+            if (filterStatus == "All") {
+              setFilteredTransaction(data);
+            } else {
+              setTransaction(data);
+            }
           }
+
           // console.log(data);
         });
     });
-  }, [transaction]);
+  }, [transaction, refreshing]);
   const storeDataPass = async (callback) => {
     AuthStore.update((s) => {
       s.isLoggedIn = false;
@@ -63,20 +91,64 @@ const orders = () => {
     }
   };
 
+  const onFilterStatus = (selectedItem) => {
+    const newData = transaction.filter((item) => {
+      return item.status === selectedItem;
+    });
+    if (selectedItem == "All") {
+      onRefresh();
+    }
+    setFilteredTransaction(newData);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.mealcontainer}>
         <Text style={styles.headertext}>ORDERS</Text>
       </View>
+
       <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         style={{
-          // backgroundColor: "#1D5D9B",
           borderRadius: 5,
           width: "98%",
           alignSelf: "center",
         }}
       >
-        <View style={{ marginVertical: "4%" }}>
+        <SelectDropdown
+          data={setterFilterOptions}
+          onSelect={(selectedItem, index) => {
+            setFilterStatus(selectedItem);
+            onFilterStatus(selectedItem);
+          }}
+          defaultButtonText={"All"}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            return selectedItem;
+          }}
+          rowTextForSelection={(item, index) => {
+            return item;
+          }}
+          buttonStyle={styles.dropdown1BtnStyle}
+          buttonTextStyle={styles.dropdown1BtnTxtStyle}
+          renderDropdownIcon={(isOpened) => {
+            return (
+              <FontAwesome
+                name={isOpened ? "chevron-up" : "chevron-down"}
+                color={"#444"}
+                size={18}
+              />
+            );
+          }}
+          dropdownIconPosition={"right"}
+          dropdownStyle={styles.dropdown1DropdownStyle}
+          rowStyle={styles.dropdown1RowStyle}
+          rowTextStyle={styles.dropdown1RowTxtStyle}
+        />
+        <View style={styles.divider} />
+
+        <View style={{}}>
           {transactShow ? (
             <>
               <View style={{ alignItems: "center", padding: "20%" }}>
@@ -87,7 +159,7 @@ const orders = () => {
             </>
           ) : (
             <>
-              {transaction.map((trans) => {
+              {filteredTransaction.map((trans) => {
                 return (
                   <View key={trans.id} style={{}}>
                     <View style={{}}>
@@ -239,9 +311,38 @@ const styles = StyleSheet.create({
   },
   confirmed: {
     padding: "4%",
-
     backgroundColor: "#2e7d32",
     borderRadius: 5,
+  },
+  dropdown1BtnStyle: {
+    width: 134,
+    height: 43,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    borderWidth: 0.5,
+    alignSelf: "flex-end",
+    marginHorizontal: "3%",
+    borderColor: "#444",
+    elevation: 10,
+    marginVertical: "2%",
+  },
+  dropdown1BtnTxtStyle: {
+    color: "black",
+    textAlign: "left",
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  dropdown1DropdownStyle: {
+    backgroundColor: "#fff",
+    padding: "2%",
+    borderRadius: 10,
+    alignSelf: "center",
+  },
+
+  dropdown1RowTxtStyle: {
+    color: "#444",
+    textAlign: "right",
+    fontWeight: "500",
   },
 });
 

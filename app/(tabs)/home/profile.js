@@ -11,15 +11,15 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-// import { AuthStore } from "";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import CustomTextInput from "./CustomTextBox";
 import { Entypo } from "@expo/vector-icons";
 import { ActivityIndicator, MD2Colors } from "react-native-paper";
 
-const SideProfile = () => {
+const profile = () => {
+  const router = useRouter();
+
   const [personInfo, setPersonInfo] = useState([]);
   const [mealPlanning, setMealPlanning] = useState([]);
   const [username, setUsername] = useState("");
@@ -30,7 +30,7 @@ const SideProfile = () => {
       setShow(true);
       setTimeout(() => {
         setShow(false);
-        router.push("./SideProfile");
+        router.push("./profile");
       }, 600);
     }
     getData(function (callback) {
@@ -48,8 +48,8 @@ const SideProfile = () => {
         })
         .then(function (personinfo) {
           setPersonInfo(personinfo);
-          var membership_type = personinfo[0].membership_type;
-          storeDataMembership_type(membership_type);
+          // var membership_type = personinfo[0].membership_type;
+          // storeDataMembership_type(membership_type);
         });
     });
   }, []);
@@ -66,31 +66,25 @@ const SideProfile = () => {
     try {
       const value = await AsyncStorage.getItem("username");
       if (value !== null) {
-        // value previously stored
         setUsername(value);
         callback(value);
       } else {
       }
-    } catch (e) {
-      // error reading value
-      // console.log(e);
-    }
+    } catch (e) {}
   };
-
-  const router = useRouter();
 
   return (
     <>
-      <View style={styles.activityindicator}>
-        <ActivityIndicator
-          style={{ zIndex: 1 }}
-          animating={show}
-          size={"large"}
-          color={MD2Colors.grey900}
-        />
-      </View>
       <ScrollView style={styles.root}>
-        <View style={{ width: "20%", position: "absolute", zIndex: 2 }}>
+        <View style={styles.activityindicator}>
+          <ActivityIndicator
+            style={{ zIndex: 10 }}
+            animating={show}
+            size={"small"}
+            color={MD2Colors.grey900}
+          />
+        </View>
+        <View style={{ width: "20%" }}>
           <TouchableOpacity
             onPress={() => {
               router.back();
@@ -100,12 +94,7 @@ const SideProfile = () => {
           </TouchableOpacity>
         </View>
 
-        <View
-          style={{
-            flex: 1,
-            width: "100%",
-          }}
-        >
+        <View style={{}}>
           {personInfo.map((personinfo) => {
             return (
               <View
@@ -117,138 +106,76 @@ const SideProfile = () => {
                 }}
               >
                 <View style={styles.headericon}>
-                  <Ionicons name="ios-person-outline" size={90} color="black" />
+                  <Ionicons name="ios-person-outline" size={90} color="#444" />
                 </View>
 
                 <View style={styles.titlecontainer}>
                   <Text style={styles.title}>Personal Information</Text>
                   <Text style={styles.label}>Fullname</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="Fullname"
-                    value={personinfo.name}
-                  />
+                  <Text style={styles.text}>{personinfo.name}</Text>
                   <Text style={styles.label}>Address</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="Address"
-                    value={personinfo.address}
-                  />
+                  <Text style={styles.text}>{personinfo.address}</Text>
 
                   <View style={styles.datecontainer}>
                     <View style={styles.date}>
                       <Text style={styles.labelbday}>Birthdate</Text>
-                      <CustomTextInput
-                        editable={false}
-                        placeholder="0000-00-00"
-                        keyboardType="numeric"
-                        value={personinfo.birthdate.slice(0, 10)}
-                      />
+
+                      <Text style={styles.text}>
+                        {personinfo.birthdate.slice(0, 10)}
+                      </Text>
                     </View>
                     <View style={styles.age}>
                       <Text style={styles.labelbday}>Age</Text>
                       <View style={styles.container}>
-                        <TextInput editable={false} style={styles.input}>
-                          {personinfo.age}
-                        </TextInput>
+                        <Text style={styles.text}> {personinfo.age}</Text>
                       </View>
                     </View>
                     <View style={styles.age}>
                       <Text style={styles.labelbday}>Gender</Text>
-                      <CustomTextInput
-                        editable={false}
-                        placeholder="Male"
-                        value={personinfo.gender}
-                      />
+                      <Text style={styles.text}> {personinfo.gender}</Text>
                     </View>
                   </View>
                   <Text style={styles.label}>Contact</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="09*******"
-                    keyboardType="numeric"
-                    inputMode={"numeric"}
-                    value={personinfo.contact}
-                  />
+                  <Text style={styles.text}>{personinfo.contact}</Text>
                 </View>
                 <View style={styles.titlecontainer}>
                   <Text style={styles.title}>Medical records</Text>
                   <Text style={styles.label}>Condition</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="na"
-                    value={personinfo.medical_conditions}
-                  />
+                  <Text style={styles.text}>
+                    {personinfo.medical_conditions}
+                  </Text>
                   <Text style={styles.label}>Allergies</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="na"
-                    value={personinfo.allergies}
-                  />
+                  <Text style={styles.text}>{personinfo.allergies}</Text>
                   <Text style={styles.label}>Medication</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="na"
-                    value={personinfo.current_medication}
-                  />
+                  <Text style={styles.text}>
+                    {personinfo.current_medication}
+                  </Text>
                   <Text style={styles.label}>Doctor's name</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="na"
-                    value={personinfo.family_doctor}
-                  />
+                  <Text style={styles.text}>{personinfo.family_doctor}</Text>
                   <Text style={styles.label}>Contact</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="09*******"
-                    keyboardType="numeric"
-                    inputMode={"numeric"}
-                    value={personinfo.doctor_contact}
-                  />
+                  <Text style={styles.text}>{personinfo.doctor_contact}</Text>
                 </View>
                 <View style={styles.titlecontainer}>
                   <Text style={styles.title}>In case of emergency</Text>
                   <Text style={styles.label}>Guardian's name</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="Gerry galino"
-                    value={personinfo.parent_name}
-                  />
+                  <Text style={styles.text}>{personinfo.parent_name}</Text>
                   <Text style={styles.label}>Address</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="aguso tc"
-                    value={personinfo.parent_address}
-                  />
+                  <Text style={styles.text}>{personinfo.parent_address}</Text>
                   <Text style={styles.label}>Contact no.</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="09*****"
-                    keyboardType={"numeric"}
-                    inputMode={"numeric"}
-                    value={personinfo.parent_contact}
-                  />
+                  <Text style={styles.text}>{personinfo.parent_contact}</Text>
                 </View>
                 <View style={styles.titlecontainer}>
                   <Text style={styles.title}>Membership</Text>
                   <Text style={styles.label}>Type</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="Student"
-                    value={personinfo.membership_type}
-                  />
+                  <Text style={styles.text}>{personinfo.membership_type}</Text>
                   <Text style={styles.label}>Start date</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="29004"
-                    value={personinfo.mem_start_date.slice(0, 10)}
-                  />
+                  <Text style={styles.text}>
+                    {personinfo.mem_start_date.slice(0, 10)}
+                  </Text>
                   <Text style={styles.label}>End date</Text>
-                  <CustomTextInput
-                    editable={false}
-                    placeholder="24490"
-                    value={personinfo.mem_end_date.slice(0, 10)}
-                  />
+                  <Text style={styles.text}>
+                    {personinfo.mem_end_date.slice(0, 10)}
+                  </Text>
                 </View>
               </View>
             );
@@ -260,9 +187,14 @@ const SideProfile = () => {
 };
 const styles = StyleSheet.create({
   root: {
-    width: "100%",
     backgroundColor: "#F9F9F9",
     marginTop: "10%",
+    backgroundColor: "white",
+    width: "90%",
+    alignSelf: "center",
+    borderRadius: 10,
+    marginBottom: "3%",
+    elevation: 600,
   },
   headericon: {
     marginVertical: "5%",
@@ -277,22 +209,28 @@ const styles = StyleSheet.create({
     fontSize: 25,
     backgroundColor: "white",
     padding: "2%",
-    borderWidth: 0.5,
+    borderBottomWidth: 0.5,
+    borderTopWidth: 0.5,
     borderColor: "grey",
     paddingLeft: "3%",
+    width: "100%",
   },
   label: {
     marginLeft: 20,
     fontSize: 20,
     marginVertical: 5,
+    color: "#444",
+    fontWeight: "600",
   },
   datecontainer: {
     flexDirection: "row",
   },
   labelbday: {
-    marginLeft: 10,
+    marginLeft: "5%",
     fontSize: 20,
     marginVertical: 2,
+    color: "#444",
+    fontWeight: "600",
   },
   date: {
     flex: 1,
@@ -304,25 +242,16 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
   },
-  input: {
-    width: "90%",
-    borderWidth: 1,
-    borderColor: "#A0A0A0",
-    height: 40,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    alignSelf: "center",
-    paddingHorizontal: 12,
-    marginVertical: 10,
-    color: "black",
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-    borderTopWidth: 0,
-  },
   activityindicator: {
     position: "absolute",
-    top: "40%",
     alignSelf: "center",
+    zIndex: 12,
+    top: "20%",
+  },
+  text: {
+    padding: "2%",
+    marginHorizontal: "4%",
+    borderColor: "#444",
   },
 });
-export default SideProfile;
+export default profile;

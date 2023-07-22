@@ -8,6 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { IconButton, Colors } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 const ItemInCart = ({
   Quantity,
   onPressDecrement,
@@ -16,7 +17,6 @@ const ItemInCart = ({
   Product_name,
   Description,
   Price,
-
   Sub_total,
   onPressremoveCart,
   setValueSubTotal,
@@ -32,25 +32,6 @@ const ItemInCart = ({
   const [Show, setShow] = useState(false);
   const [cart, setCart] = useState([]);
 
-  const [grandTotal, setGrandTotal] = useState(0);
-
-  // const handleGrandTotalTrans = useContext(dataContext);
-
-  // const transferData = () => {
-  //   handleGrandTotalTrans(grandTotal);
-  // };
-  // console.log(grandTotal);
-
-  // const formatDate = (date) => {
-  //   var dateToFormat = new Date(date);
-  //   var year = dateToFormat.toLocaleString("default", { year: "numeric" });
-  //   var month = dateToFormat.toLocaleString("default", { month: "2-digit" });
-  //   var day = dateToFormat.toLocaleString("default", { day: "2-digit" });
-
-  //   var formattedDate = year + "-" + month + "-" + day;
-  //   return formattedDate;
-  // };
-
   const storeDataUser = async () => {
     const valueUsername = await AsyncStorage.getItem("username");
     try {
@@ -63,7 +44,6 @@ const ItemInCart = ({
 
   useEffect(() => {
     storeDataUser();
-    // GET METHOD
 
     getData(function (callback) {
       fetch("https://gymerls-api-staging.vercel.app/api/get-cart-by-id", {
@@ -78,9 +58,6 @@ const ItemInCart = ({
       })
         .then((res) => res.json())
         .then((result) => {
-          // onGrandTransfer(grandTotal);
-          // transferData();
-          // mappingPrice();
           setCart(result);
         });
     });
@@ -96,13 +73,6 @@ const ItemInCart = ({
       }
     } catch (e) {}
   };
-
-  // const mappingPrice = () => {
-  //   let t = 0;
-  //   cart.map(({ sub_total }) => (t = t + sub_total));
-  //   setGrandTotal(t);
-  //   return t;
-  // };
 
   return (
     <View>
@@ -183,7 +153,7 @@ const ItemInCart = ({
                     <View
                       style={{
                         marginBottom: "2%",
-                        marginLeft: "2%",
+                        marginHorizontal: "2%",
                         borderBottomWidth: 0.5,
                         borderColor: "#444",
                       }}
@@ -251,7 +221,6 @@ const ItemInCart = ({
                       fontWeight: "bold",
                       margin: "2%",
                       paddingHorizontal: "2%",
-                      backgroundColor: "#bebebe",
                       paddingBottom: "2%",
                       paddingTop: "2%",
                       borderRadius: 5,

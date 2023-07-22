@@ -11,13 +11,13 @@ import { AuthStore } from "../../store.js";
 import { Stack, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import CustomButton from "../(Component)/CustomButton.js";
-// import CustomInput from "../(Component)/CustomInput.js";
 import { useHandler } from "react-native-reanimated";
 import { TextInput } from "react-native-paper";
 import { MaterialCommunityIcons } from "react-native-vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Padlock from "../../assets/images/Padlock.png";
-import { NativeViewGestureHandler } from "react-native-gesture-handler";
+import * as Network from "expo-network";
+import * as Device from "expo-device";
 
 export default function LogIn() {
   const router = useRouter();
@@ -25,6 +25,7 @@ export default function LogIn() {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [ipAddress, setIpAdress] = useState("");
 
   const [Item, setItem] = useState("");
 
@@ -44,6 +45,39 @@ export default function LogIn() {
     }
   };
 
+  const getIpAddress = async (ipAddress) => {
+    try {
+      const ipAdd = await Network.getIpAddressAsync();
+
+      if (ipAdd !== null) {
+        setIpAdress(ipAdd);
+        ipAddress(ipAdd);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const userLog = (username, event) => {
+    getIpAddress(function (ipAddress) {
+      fetch("https://gymerls-api-staging.vercel.app/api/insert-log", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          event_info: "Logon - " + event,
+          ip_address: ipAddress,
+          platform: Device.osName,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+    });
+  };
+
   const loginUser = () => {
     // GET METHOD
     // fetch('https://gymerls-api-staging.vercel.app/api/users')
@@ -55,6 +89,9 @@ export default function LogIn() {
     //   })
 
     // POST METHOD
+
+    const usernameInput = username;
+
     fetch("https://gymerls-api-staging.vercel.app/api/get-user", {
       method: "POST",
       headers: {
@@ -71,15 +108,16 @@ export default function LogIn() {
       .then(function (userData) {
         if (userData.length === 0) {
           setShowAuth(true);
+          userLog(usernameInput, "failed");
         } else {
           if (userData[0].role !== "user") {
             setShowAuth(true);
           } else {
             var password = userData[0].password;
             var username = userData[0].username;
-
             storeData(username);
             storeDataPass(password);
+            userLog(username, "success");
             router.replace("/(tabs)/home");
           }
         }
@@ -102,6 +140,17 @@ export default function LogIn() {
       })
       .then(function (userData) {});
   }, []);
+
+  const formatDateWithTime = (date) => {
+    var dateToFormat = new Date(date);
+    var year = dateToFormat.toLocaleString("default", { year: "numeric" });
+    var month = dateToFormat.toLocaleString("default", { month: "2-digit" });
+    var day = dateToFormat.toLocaleString("default", { day: "2-digit" });
+    var re = dateToFormat.toLocaleString("en-GB");
+    re = re.slice(12);
+    var formattedDateAndTime = year + "-" + month + "-" + day + " " + re;
+    return formattedDateAndTime;
+  };
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

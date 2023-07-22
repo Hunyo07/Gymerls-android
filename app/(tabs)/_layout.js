@@ -4,8 +4,6 @@ import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { Text } from "react-native-paper";
-
 // 🏠
 // ⚙️
 
@@ -14,20 +12,17 @@ const TabsLayout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
         tabBarActiveBackgroundColor: "#EBEBEB",
-        tabBarStyle: { height: "7%", borderRadius: 10 },
+        tabBarStyle: { borderRadius: 10, height: 55 },
+        tabBarActiveTintColor: "#28282B",
+        tabBarLabelStyle: { fontWeight: "700" },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
           title: "Home",
-          tabBarIcon: () => (
-            <Text>
-              <Entypo name="home" size={26} color="grey" />
-            </Text>
-          ),
+          tabBarIcon: () => <Entypo name="home" size={26} color="grey" />,
         }}
       />
 
@@ -36,9 +31,7 @@ const TabsLayout = () => {
         options={{
           title: "Meal",
           tabBarIcon: () => (
-            <Text>
-              <MaterialIcons name="set-meal" size={26} color="grey" />
-            </Text>
+            <MaterialIcons name="set-meal" size={26} color="grey" />
           ),
         }}
       />
@@ -46,33 +39,25 @@ const TabsLayout = () => {
       <Tabs.Screen
         name="store"
         options={{
-          title: "store",
-          tabBarIcon: () => (
-            <Text>
-              <Entypo name="shop" size={26} color="grey" />
-            </Text>
-          ),
+          title: "Store",
+          tabBarIcon: () => <Entypo name="shop" size={26} color="grey" />,
         }}
       />
       <Tabs.Screen
         name="product"
         options={{
-          title: "Product",
+          title: "Cart",
           tabBarIcon: () => (
-            <Text>
-              <Entypo name="shopping-cart" size={26} color="grey" />
-            </Text>
+            <Entypo name="shopping-cart" size={26} color="grey" />
           ),
         }}
       />
       <Tabs.Screen
         name="orders"
         options={{
-          title: "orders",
+          title: "Orders",
           tabBarIcon: () => (
-            <Text>
-              <Entypo name="shopping-bag" size={26} color="grey" />
-            </Text>
+            <Entypo name="shopping-bag" size={26} color="grey" />
           ),
         }}
       />
@@ -81,9 +66,7 @@ const TabsLayout = () => {
         options={{
           title: "Schedule",
           tabBarIcon: () => (
-            <Text>
-              <FontAwesome name="calendar" size={26} color="grey" />
-            </Text>
+            <FontAwesome name="calendar" size={26} color="grey" />
           ),
         }}
       />
@@ -91,11 +74,7 @@ const TabsLayout = () => {
         name="Settings"
         options={{
           title: "Settings",
-          tabBarIcon: () => (
-            <Text>
-              <Ionicons name="settings" size={26} color="grey" />
-            </Text>
-          ),
+          tabBarIcon: () => <Ionicons name="settings" size={26} color="grey" />,
         }}
       />
     </Tabs>

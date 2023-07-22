@@ -5,6 +5,7 @@ import {
   ScrollView,
   Dimensions,
   RefreshControl,
+  KeyboardAvoidingView,
 } from "react-native";
 import React from "react";
 import { DatePickerModal, es, tr } from "react-native-paper-dates";
@@ -25,12 +26,14 @@ import { Entypo } from "@expo/vector-icons";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { en, registerTranslation } from "react-native-paper-dates";
+import { useRouter } from "expo-router";
 
 registerTranslation("en", en);
 
-const Scheduleindex = () => {
-  const [expanded, setExpanded] = React.useState(false);
+const index = () => {
+  const router = useRouter();
 
+  const [expanded, setExpanded] = React.useState(false);
   const [dateValue, setDateValue] = React.useState(new Date());
   const [openCalendar, setOpenCalendar] = React.useState(false);
   const [inputDate, setInputDate] = React.useState(new Date());
@@ -41,28 +44,17 @@ const Scheduleindex = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [newReservationData, setNewReservationData] = useState([]);
   const [membershipType, setMembershipType] = useState("");
-  const [firstBatchIsDisabled, setFirstBatchIsDisabled] = useState(true);
-  const [secondBatchIsDisabled, setSecondBatchIsDisabled] = useState(true);
-  const [thirdBatchIsDisabled, setThirdBatchIsDisabled] = useState(true);
-  const [fourthBatchIsDisabled, setFourthBatchIsDisabled] = useState(true);
-  const [fifthBatchIsDisabled, setFifthBatchIsDisabled] = useState(true);
-  const [lastBatchIsDisabled, setLastBatchIsDisabled] = useState(true);
   const [showSchedByMemberTypeShip, setShowSchedByMemberTypeShip] =
     useState(true);
-
+  const [ipAddress, setIpAdress] = useState("");
   const [refreshing, setRefreshing] = React.useState(false);
-  const [coachName, setCoachName] = useState("");
-  const [notes, setNotes] = useState("");
-  const [timeList, setTimeList] = useState("Select Option");
-
-  const citiesDropdownRef = useRef();
 
   const onRefresh = React.useCallback(() => {
     setFilterStatus("All");
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-    }, 1000);
+    }, 2000);
   }, []);
 
   const onDismissSingle = React.useCallback(() => {
@@ -162,111 +154,6 @@ const Scheduleindex = () => {
     }
   };
 
-  const handleOpenModalCreateReservation = () => {
-    getReservationByDate(inputDate);
-  };
-
-  const createSchedule = () => {
-    notes.length === 0
-      ? alert("Please fill up the following fields")
-      : coachName.length === 0
-      ? alert("Please fill up the following fields")
-      : timeList === "Select Option"
-      ? alert("Please Select Option")
-      : formatDate(new Date()) <= formatDate(inputDate)
-      ? createReservation()
-      : alert("Cannot make reservation on " + formatDate(inputDate));
-  };
-
-  const createReservation = () => {
-    fetch("https://gymerls-api-staging.vercel.app/api/create-reservation", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        notes: notes,
-        reservation_date: formatDate(inputDate),
-        status: "Pending",
-        time_slot: timeList,
-        coach_name: coachName,
-        added_date: formatDate(new Date()),
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log(result);
-        cancelFunctionSchedule();
-        alert("Create Reservation Complete");
-      });
-  };
-
-  const getReservationByDate = () => {
-    var formattedDate = formatDate(inputDate);
-    fetch(
-      "https://gymerls-api-staging.vercel.app/api/get-reservation-by-date-and-status-is-confirmed",
-      {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          reservation_date: formattedDate,
-        }),
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        var first_batch = [];
-        var second_batch = [];
-        var third_batch = [];
-        var fourth_batch = [];
-        var fifth_batch = [];
-        var last_batch = [];
-
-        for (let item of data) {
-          if (item.time_slot === "7-9AM") {
-            first_batch.push(item);
-          } else if (item.time_slot === "9-11AM") {
-            second_batch.push(item);
-          } else if (item.time_slot === "1-3PM") {
-            third_batch.push(item);
-          } else if (item.time_slot === "3-5PM") {
-            fourth_batch.push(item);
-          } else if (item.time_slot === "5-7PM") {
-            fifth_batch.push(item);
-          } else {
-            last_batch.push(item);
-          }
-        }
-
-        first_batch.length === 10
-          ? setFirstBatchIsDisabled(true)
-          : setFirstBatchIsDisabled(false);
-
-        second_batch.length === 10
-          ? setSecondBatchIsDisabled(true)
-          : setSecondBatchIsDisabled(false);
-
-        third_batch.length === 10
-          ? setThirdBatchIsDisabled(true)
-          : setThirdBatchIsDisabled(false);
-
-        fourth_batch.length === 10
-          ? setFourthBatchIsDisabled(true)
-          : setFourthBatchIsDisabled(false);
-
-        fifth_batch.length === 10
-          ? setFifthBatchIsDisabled(true)
-          : setFifthBatchIsDisabled(false);
-
-        last_batch.length === 10
-          ? setLastBatchIsDisabled(true)
-          : setLastBatchIsDisabled(false);
-      });
-  };
-
   const getData = async (callback) => {
     try {
       const value = await AsyncStorage.getItem("username");
@@ -278,8 +165,6 @@ const Scheduleindex = () => {
     } catch (e) {}
   };
 
-  const [open, setOpen] = useState(false);
-  const [timeSlot, setTimeSlot] = useState(inputDate);
   const formatDate = (date) => {
     var dateToFormat = new Date(date);
     var year = dateToFormat.toLocaleString("default", { year: "numeric" });
@@ -288,12 +173,6 @@ const Scheduleindex = () => {
 
     var formattedDate = year + "-" + month + "-" + day;
     return formattedDate;
-  };
-
-  const cancelFunctionSchedule = () => {
-    setAddNewReserve(false);
-    setTimeList("Select Option");
-    setExpanded(false);
   };
 
   var dateFIlter = formatDate(dateValue);
@@ -361,8 +240,7 @@ const Scheduleindex = () => {
                     textColor="black"
                     size={24}
                     onPress={() => {
-                      setAddNewReserve(true);
-                      handleOpenModalCreateReservation();
+                      router.push("../Schedule/reservation");
                     }}
                   >
                     Sched
@@ -382,7 +260,6 @@ const Scheduleindex = () => {
                     defaultButtonText={"All"}
                     buttonTextAfterSelection={(selectedItem, index) => {
                       return filterStatus;
-                      // return selectedItem;
                     }}
                     defaultValueByIndex={0}
                     rowTextForSelection={(item, index) => {
@@ -542,7 +419,6 @@ const Scheduleindex = () => {
                                 </Text>
                               </View>
                             </View>
-                            {/* </View> */}
                             <View
                               style={[
                                 res.status,
@@ -600,264 +476,6 @@ const Scheduleindex = () => {
           </>
         )}
       </ScrollView>
-
-      {showAddNewReserve ? (
-        <>
-          <View
-            style={{
-              position: "absolute",
-              width: "100%",
-              zIndex: 1,
-              backgroundColor: "transparent",
-              marginVertical: "20%",
-              elevation: 500,
-            }}
-          >
-            <View
-              style={{
-                padding: "2%",
-                elevation: 100,
-                borderRadius: 5,
-                backgroundColor: "white",
-                width: "90%",
-                marginVertical: "20%",
-                alignSelf: "center",
-              }}
-            >
-              <View style={{ marginHorizontal: "3%" }}>
-                <Text style={{ fontSize: 18 }}>CREATE NEW RESERVATION</Text>
-              </View>
-              <View style={{ marginHorizontal: "3%" }}>
-                <Text style={{ color: "grey" }}>Fill up all fields</Text>
-              </View>
-
-              <DatePickerInput
-                locale="en"
-                style={{
-                  marginHorizontal: "2%",
-                  marginVertical: "1%",
-                  backgroundColor: "white",
-                }}
-                value={inputDate}
-                onConfirm={handleOpenModalCreateReservation()}
-                onChange={(d) => {
-                  setTimeList("Select Option");
-                  setInputDate(d);
-                }}
-                inputMode="start"
-                mode="outlined"
-              />
-
-              <TextInput
-                onChangeText={(t) => setNotes(t)}
-                setValue={setNotes}
-                style={{
-                  marginHorizontal: "2%",
-                  marginVertical: "1%",
-                  backgroundColor: "white",
-                }}
-                label="Note*"
-                mode="outlined"
-                theme={{ colors: { text: "white", primary: "black" } }}
-              />
-              <View>
-                <Text
-                  style={{
-                    marginHorizontal: "2%",
-                    fontSize: 12,
-                    color: "grey",
-                    width: "100%",
-                  }}
-                >
-                  Please select time slot
-                </Text>
-                <List.Accordion
-                  titleStyle={{ fontWeight: "600" }}
-                  title={timeList}
-                  expanded={expanded}
-                  onPress={() => {
-                    expanded === true ? setExpanded(false) : setExpanded(true);
-                  }}
-                  theme={{ colors: { text: "white", primary: "black" } }}
-                  style={{
-                    marginVertical: "1%",
-                    borderRadius: 5,
-                    borderWidth: 0.5,
-                    width: "95%",
-                    alignSelf: "center",
-                    backgroundColor: "#fff",
-                    zIndex: 10,
-                  }}
-                >
-                  <View
-                    style={{
-                      borderWidth: 0.5,
-                      borderRadius: 5,
-                      width: "95%",
-                      alignSelf: "center",
-                      position: "absolute",
-                      backgroundColor: "white",
-                      zIndex: 10,
-                      marginTop: "20%",
-                    }}
-                  >
-                    <List.Item
-                      titleStyle={[
-                        styles.listItem,
-                        firstBatchIsDisabled === true
-                          ? styles.listItemDisabled
-                          : styles.listItem,
-                      ]}
-                      disabled={firstBatchIsDisabled}
-                      style={{ height: 45, zIndex: 200 }}
-                      title="7-9AM"
-                      onPress={() => {
-                        setTimeList("7-9AM");
-                        setExpanded(false);
-                      }}
-                    />
-                    <List.Item
-                      titleStyle={[
-                        styles.listItem,
-                        secondBatchIsDisabled === true
-                          ? styles.listItemDisabled
-                          : styles.listItem,
-                      ]}
-                      disabled={secondBatchIsDisabled}
-                      style={{ height: 45 }}
-                      title="9-11AM"
-                      onPress={() => {
-                        setTimeList("9-11AM");
-                        setExpanded(false);
-                      }}
-                    />
-                    <List.Item
-                      titleStyle={[
-                        styles.listItem,
-                        thirdBatchIsDisabled === true
-                          ? styles.listItemDisabled
-                          : styles.listItem,
-                      ]}
-                      disabled={thirdBatchIsDisabled}
-                      style={{ height: 45 }}
-                      title="1-3PM"
-                      onPress={() => {
-                        setTimeList("1-3PM");
-                        setExpanded(false);
-                      }}
-                    />
-                    <List.Item
-                      titleStyle={[
-                        styles.listItem,
-                        fourthBatchIsDisabled === true
-                          ? styles.listItemDisabled
-                          : styles.listItem,
-                      ]}
-                      disabled={fourthBatchIsDisabled}
-                      style={{ height: 45 }}
-                      title="3-5PM"
-                      onPress={() => {
-                        setTimeList("3-5PM");
-                        setExpanded(false);
-                      }}
-                    />
-                    <List.Item
-                      titleStyle={[
-                        styles.listItem,
-                        fifthBatchIsDisabled === true
-                          ? styles.listItemDisabled
-                          : styles.listItem,
-                      ]}
-                      disabled={fifthBatchIsDisabled}
-                      style={{ height: 45 }}
-                      title="5-7PM"
-                      onPress={() => {
-                        setTimeList("5-7PM");
-                        setExpanded(false);
-                      }}
-                    />
-                    <List.Item
-                      titleStyle={[
-                        styles.listItem,
-                        lastBatchIsDisabled === true
-                          ? styles.listItemDisabled
-                          : styles.listItem,
-                      ]}
-                      disabled={lastBatchIsDisabled}
-                      style={{ height: 45 }}
-                      title="7-9PM"
-                      onPress={() => {
-                        setTimeList("7-9PM");
-                        setExpanded(false);
-                      }}
-                    />
-                  </View>
-                </List.Accordion>
-              </View>
-
-              <TextInput
-                label="Coach*"
-                mode="outlined"
-                onChangeText={(text) => setCoachName(text)}
-                setValue={setCoachName}
-                style={{
-                  width: "95%",
-                  alignSelf: "center",
-                  backgroundColor: "white",
-                  zIndex: -2,
-                }}
-                theme={{ colors: { text: "white", primary: "black" } }}
-              />
-              <View
-                style={{
-                  flexDirection: "row",
-                  zIndex: -10,
-                  marginVertical: "4%",
-                }}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    marginVertical: "2%",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      cancelFunctionSchedule();
-                    }}
-                  >
-                    <Text style={{ fontWeight: 600, color: "#444" }}>
-                      CANCEL
-                    </Text>
-                    {/* <Entypo name="chevron-small-left" size={45} /> */}
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    marginVertical: "2%",
-                    alignItems: "center",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      createSchedule();
-                    }}
-                  >
-                    <Text style={{ fontWeight: 600, color: "#444" }}>
-                      CREATE
-                    </Text>
-                    {/* <Entypo name="chevron-small-left" size={45} /> */}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </View>
-        </>
-      ) : (
-        <></>
-      )}
     </View>
   );
 };
@@ -875,7 +493,7 @@ const styles = StyleSheet.create({
   },
   headertext: {
     fontSize: 30,
-    // color: "#fff",
+    color: "#444",
     fontWeight: 700,
   },
   pending: {
@@ -945,26 +563,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 5,
   },
-  // dropdown1RowStyle: {
-  //   backgroundColor: "#EFEFEF",
-  //   borderBottomColor: "#C5C5C5",
-  // },
+
   dropdown1RowTxtStyle: { color: "#444", textAlign: "left", fontWeight: "500" },
-  // divider: { width: 12 },
-  // dropdown2BtnStyle: {
-  //   flex: 1,
-  //   height: 50,
-  //   backgroundColor: "#FFF",
-  //   // borderRadius: 8,
-  //   borderWidth: 1,
-  //   borderColor: "#444",
-  // },
-  // dropdown2BtnTxtStyle: { color: "#444", textAlign: "left" },
-  // dropdown2DropdownStyle: { backgroundColor: "#EFEFEF" },
-  // dropdown2RowStyle: {
-  //   backgroundColor: "#EFEFEF",
-  //   borderBottomColor: "#C5C5C5",
-  // },
-  // dropdown2RowTxtStyle: { color: "#444", textAlign: "left" },
+  form: {
+    zIndex: 2,
+  },
 });
-export default Scheduleindex;
+export default index;

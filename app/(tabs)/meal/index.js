@@ -12,11 +12,13 @@ import { block } from "react-native-reanimated";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, MD2Colors, Button } from "react-native-paper";
-import { FlatList } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
+import * as Network from "expo-network";
+import * as Device from "expo-device";
+
 const Tab4Index = ({ disabled }) => {
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -25,9 +27,10 @@ const Tab4Index = ({ disabled }) => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [mealToday, setMealToday] = useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [ipAddress, setIpAdress] = useState("");
 
   const onRefresh = React.useCallback(() => {
-    getIpAddress();
+    getIp();
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
@@ -46,9 +49,9 @@ const Tab4Index = ({ disabled }) => {
     } else {
       day === 0
         ? setMealToday([
-            meals[0].sat_bf_meal,
-            meals[0].sat_lunch_meal,
-            meals[0].sat_dinner_meal,
+            meals[0].sun_bf_meal,
+            meals[0].sun_lunch_meal,
+            meals[0].sun_dinner_meal,
           ])
         : day === 1
         ? setMealToday([
@@ -81,9 +84,9 @@ const Tab4Index = ({ disabled }) => {
             meals[0].fri_dinner_meal,
           ])
         : setMealToday([
-            meals[0].sun_bf_meal,
-            meals[0].sun_lunch_meal,
-            meals[0].sun_dinner_meal,
+            meals[0].sat_bf_meal,
+            meals[0].sat_lunch_meal,
+            meals[0].sat_dinner_meal,
           ]);
     }
   };
@@ -114,15 +117,36 @@ const Tab4Index = ({ disabled }) => {
     });
   }, [refreshing]);
 
-  const getIpAddress = (callback) => {
-    fetch("https://api.ipify.org?format=json")
-      .then((response) => response.json())
-      .then((data) => {
-        callback(data.ip);
-        console.log(data.ip);
-      })
-      .catch((error) => console.log(error));
+  const getData = async (callback) => {
+    try {
+      const value = await AsyncStorage.getItem("username");
+      if (value !== null) {
+        setUsername(value);
+        callback(value);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
+  const getIp = async () => {
+    try {
+      const platForm = "Android " + Device.brand;
+      const ipAdd = await Network.getIpAddressAsync();
+      if (platForm !== null) {
+        // console.log(platForm);
+      } else {
+      }
+      if (ipAdd !== null) {
+        setIpAdress(ipAdd);
+        // console.log(ipAdd);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <View style={styles.root}>
       <View style={styles.mealcontainer}>
@@ -139,6 +163,7 @@ const Tab4Index = ({ disabled }) => {
             marginHorizontal: "2%",
             padding: "2%",
             borderRadius: 5,
+            elevation: 10,
           }}
         >
           <View

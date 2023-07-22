@@ -27,7 +27,7 @@ const Index = () => {
     router.replace("/login");
     // } else if (isLoggedIn) {
     //   // go to tabs root.
-    router.replace("/(tabs)/home");
+    router.replace("/login");
     // }
   }, [isLoggedIn, segments, navigationState?.key]);
 
