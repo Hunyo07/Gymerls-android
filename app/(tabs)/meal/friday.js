@@ -57,15 +57,6 @@ const Tab4Index = () => {
   return (
     <View style={{ flex: 1, justifyContent: "center" }}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.gobackbutton}>
-        <TouchableOpacity
-          onPress={() => {
-            router.push("../meal");
-          }}
-        >
-          <Entypo name="chevron-small-left" size={45} />
-        </TouchableOpacity>
-      </View>
       <View style={styles.activityindicator}>
         <ActivityIndicator
           animating={show}
@@ -78,7 +69,20 @@ const Tab4Index = () => {
         return (
           <View key={meals.id}>
             <View style={styles.headercontainer}>
-              <Text style={styles.headertext}>FRIDAY</Text>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, position: "absolute", zIndex: 2 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      router.push("../meal");
+                    }}
+                  >
+                    <Entypo name="chevron-small-left" size={45} />
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 4, alignItems: "center" }}>
+                  <Text style={styles.headertext}>FRIDAY</Text>
+                </View>
+              </View>
               <View style={styles.card}>
                 <Text style={styles.breakfasttext}>
                   <MaterialIcons name="free-breakfast" size={26} color="#444" />{" "}
@@ -119,16 +123,6 @@ const Tab4Index = () => {
 };
 
 const styles = StyleSheet.create({
-  gobackbutton: {
-    top: "6%",
-    width: "11%",
-    position: "absolute",
-    backgroundColor: "#fff",
-    borderRadius: 100,
-    elevation: 100,
-    marginHorizontal: 8,
-    alignItems: "center",
-  },
   headercontainer: {
     alignItems: "center",
     alignSelf: "center",

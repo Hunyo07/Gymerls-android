@@ -11,17 +11,10 @@ import React from "react";
 import { DatePickerModal, es, tr } from "react-native-paper-dates";
 import { Button, List } from "react-native-paper";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { DatePickerInput } from "react-native-paper-dates";
 const { width } = Dimensions.get("window");
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  IconButton,
-  MD3Colors,
-  TextInput,
-  ActivityIndicator,
-} from "react-native-paper";
-import { TouchableOpacity } from "react-native";
+
 import { Entypo } from "@expo/vector-icons";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -50,7 +43,6 @@ const index = () => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
-    setFilterStatus("All");
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
@@ -112,6 +104,7 @@ const index = () => {
             : setShowSchedByMemberTypeShip(true);
         });
     });
+
     getData(function (callback) {
       fetch(
         "https://gymerls-api-staging.vercel.app/api/get-reservation-by-username-and-date",
@@ -128,29 +121,39 @@ const index = () => {
       )
         .then((response) => response.json())
         .then((data) => {
-          if (filterStatus === "All") {
-            setNewReservationData(data);
-            reservationData.length !== 0
-              ? setShowSchedules(false)
-              : setShowSchedules(true);
-          }
           setReservationData(data);
+          if (filterStatus == "All") {
+            setNewReservationData(data);
+            if (data.length != []) {
+              setShowSchedules(false);
+            }
+          }
         });
     });
-  }, [refreshing, reservationData]);
+  }, [refreshing]);
 
   const onFilterStatus = (selectedItem) => {
     const newData = reservationData.filter((item) => {
-      return item.status === selectedItem;
+      return item.status == selectedItem;
     });
-    if (selectedItem == "All") {
-      onRefresh();
-    }
-    setNewReservationData(newData);
-    if (newData.length === 0) {
-      setShowSchedules(true);
+    if (newData.length == []) {
+      setNewReservationData(reservationData);
     } else {
-      setShowSchedules(false);
+    }
+    if (selectedItem == "All") {
+      setNewReservationData(reservationData);
+      if (reservationData.length == []) {
+        setShowSchedules(true);
+      } else {
+        setShowSchedules(false);
+      }
+    } else {
+      setNewReservationData(newData);
+      if (newData.length == []) {
+        setShowSchedules(true);
+      } else {
+        setShowSchedules(false);
+      }
     }
   };
 
@@ -259,7 +262,7 @@ const index = () => {
                     }}
                     defaultButtonText={"All"}
                     buttonTextAfterSelection={(selectedItem, index) => {
-                      return filterStatus;
+                      return selectedItem;
                     }}
                     defaultValueByIndex={0}
                     rowTextForSelection={(item, index) => {
@@ -311,6 +314,14 @@ const index = () => {
                       marginTop: "20%",
                     }}
                   >
+                    <Text
+                      style={{
+                        color: "grey",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      scroll down to reload..
+                    </Text>
                     <Text
                       style={{
                         fontSize: 16,
@@ -546,7 +557,6 @@ const styles = StyleSheet.create({
 
   dropdown1BtnStyle: {
     width: 134,
-    // flex: 5,
     height: 43,
     backgroundColor: "#FFF",
     borderRadius: 20,

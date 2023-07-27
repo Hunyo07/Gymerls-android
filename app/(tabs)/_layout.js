@@ -11,11 +11,11 @@ const TabsLayout = () => {
   return (
     <Tabs
       screenOptions={{
+        tabBarShowLabel: false,
         headerShown: false,
         tabBarActiveBackgroundColor: "#EBEBEB",
         tabBarStyle: { borderRadius: 10, height: 55 },
         tabBarActiveTintColor: "#28282B",
-        tabBarLabelStyle: { fontWeight: "700" },
       }}
     >
       <Tabs.Screen

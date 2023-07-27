@@ -275,6 +275,7 @@ const Tab5Index = () => {
                   style={{
                     fontFamily: "EncodeSansSemiCondensed_700Bold",
                     color: "grey",
+                    fontSize: 12,
                   }}
                 >
                   SCROLL DOWN TO RELOAD..

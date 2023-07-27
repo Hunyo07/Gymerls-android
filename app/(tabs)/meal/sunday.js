@@ -46,13 +46,11 @@ const Tab4Index = () => {
     try {
       const value = await AsyncStorage.getItem("username");
       if (value !== null) {
-        // value previously stored
         setUsername(value);
         callback(value);
       } else {
       }
     } catch (e) {
-      // error reading value
       console.log(e);
     }
   };
@@ -60,16 +58,7 @@ const Tab4Index = () => {
   return (
     <View style={{ flex: 1, justifyContent: "center" }}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.gobackbutton}>
-        <TouchableOpacity
-          onPress={() => {
-            // setIsDisabled(false)
-            router.push("../../meal");
-          }}
-        >
-          <Entypo name="chevron-small-left" size={45} />
-        </TouchableOpacity>
-      </View>
+
       <View style={styles.activityindicator}>
         <ActivityIndicator
           animating={show}
@@ -81,7 +70,21 @@ const Tab4Index = () => {
         return (
           <View key={meals.id}>
             <View style={styles.elavation}>
-              <Text style={styles.headertext}>SUNDAY</Text>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, position: "absolute", zIndex: 2 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      router.push("../meal");
+                    }}
+                  >
+                    <Entypo name="chevron-small-left" size={45} />
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 4, alignItems: "center" }}>
+                  <Text style={styles.headertext}>SUNDAY</Text>
+                </View>
+              </View>
+
               <View style={styles.card}>
                 <Text style={styles.breakfasttext}>
                   <MaterialIcons name="free-breakfast" size={26} color="#444" />{" "}
@@ -121,17 +124,6 @@ const Tab4Index = () => {
 };
 
 const styles = StyleSheet.create({
-  gobackbutton: {
-    top: "6%",
-    width: "11%",
-    position: "absolute",
-    backgroundColor: "#fff",
-    borderRadius: 100,
-    elevation: 100,
-    alignItems: "center",
-    marginHorizontal: 8,
-    alignItems: "center",
-  },
   elavation: {
     alignItems: "center",
     alignSelf: "center",
@@ -153,7 +145,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     paddingVertical: 10,
-    // elevation: ,
   },
   breakfasttext: {
     marginLeft: 20,

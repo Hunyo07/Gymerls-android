@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
     padding: "2%",
     marginHorizontal: "4%",
     borderColor: "#444",
+    color: "#444",
   },
 });
 export default profile;
